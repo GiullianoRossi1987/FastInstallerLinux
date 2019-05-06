@@ -1,0 +1,14 @@
+[
+  {"Installer": [
+    {
+      "Package_nm": "",
+      "Command": ""
+    }
+  ]},
+  {"Gitter": [
+    {"RemoteName": "", "Host": "", "EmailUser": "", "NameUser": "", "Name": ""}
+  ]},
+  {"Config": {
+    "SnapInstalled": "True", "GitInstalled": "True"
+  }}
+]
