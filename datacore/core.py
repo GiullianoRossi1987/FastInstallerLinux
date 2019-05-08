@@ -1,12 +1,14 @@
 # coding = utf-8
-
+# using namespace std
 import json
 from os import system, chdir
 from typing import Any, AnyStr
 
+# todo: refazer o sistema com sem documentos especificos
+
 
 class Database(object):
-    document = Any
+    document = list()
     file_name = AnyStr
 
     def __init__(self, file_name="datacore/database.json"):
@@ -26,13 +28,13 @@ class Database(object):
 
 
 class Installer(Database):
-    doc_installer = list()
+    doc_installer = list()  # todo: documentos tipo esse
 
     @classmethod
     def __init_subclass__(cls): cls.doc_installer = cls.document[0]["Installer"]
 
     @classmethod
-    def faster(cls): cls.union_doc({"Installer": cls.doc_installer}, 0)
+    def faster(cls): cls.union_doc(dc={"Installer": cls.doc_installer}, index=0)
 
     class PackageNotFound(Exception):
         args = "esse pacote nao pode ser encontrado!"
@@ -209,6 +211,14 @@ class Gitter(Database):
             a = system("git config --global user.email = "+cls.doc_gitter[ind]["EmailUser"])
             del a
             chdir("..")
+
+
+class Configurations(Database):
+    doc_config = dict()
+
+    @classmethod
+    def __init_subclass__(cls): cls.doc_config = cls.document[2]["Config"]
+
 
 
 
