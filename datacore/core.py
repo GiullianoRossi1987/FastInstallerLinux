@@ -1,223 +1,228 @@
 # coding = utf-8
 # using namespace std
-import json
+import sqlite3
 from os import system, chdir
-from typing import Any, AnyStr
+from typing import Optional, Any
 
-# todo: refazer o sistema com sem documentos especificos
+
+
+__doc__ = """
+This is the main database system. You can import this file, or easily start the main file (installer.py)
+The database use only two tables on the database: database.db
+And it have all the important and used data for configure repositories and download packages.
+"""
 
 
 class Database(object):
-    document = list()
-    file_name = AnyStr
+    __doc__ = """
+    The all classes core, where's declared the database connection, and it's cursor.
+    Without this class the system's nothing.
+    """
+    connection = sqlite3.connect("datacore/database.db", timeout=10)
+    cursor = connection.cursor()
+    closed = bool
 
-    def __init__(self, file_name="datacore/database.json"):
-        self.file_name = file_name
-        with open(self.file_name, "r") as dl: self.document = json.loads(dl.read())
+    def __init__(self):
+        """Start the connection and declare the cursor.Maybe not useful. But there is it."""
+        self.cursor = self.connection.cursor()
+        self.closed = False
 
-    @classmethod
-    def update(cls):
-        n = json.dumps(cls.document)
-        with open(cls.file_name, "w") as fl: fl.write(n)
-        del n
-
-    @classmethod
-    def union_doc(cls, dc: dict, index: int):
-        cls.document[index] = dc
-        cls.update()
+    def close(self):
+        """Closes the connection and the cursor, also it alerts the system there was a closed connection"""
+        self.cursor.close()
+        self.connection.close()
+        self.closed = True
 
 
 class Installer(Database):
-    doc_installer = list()  # todo: documentos tipo esse
 
-    @classmethod
-    def __init_subclass__(cls): cls.doc_installer = cls.document[0]["Installer"]
-
-    @classmethod
-    def faster(cls): cls.union_doc(dc={"Installer": cls.doc_installer}, index=0)
+    __doc__ = """
+    This class works only with the Packages table. It have functions and procedures for the packages management
+    """
 
     class PackageNotFound(Exception):
-        args = "esse pacote nao pode ser encontrado!"
+        __doc__ = "If the typed package was not found in the database. Similar to FileNotFound"
+        args = "Esse pacote nao existe no banco de dados!"
 
     class PackageExistsError(Exception):
-        args = "esse pacote ja existe no banco de dados"
-
-    class UnfiledCamp(Exception):
-        args = "esse campo nao eh um campo valido!"
+        __doc__ = "If the typed package already exists, to prevent duplicate data in the database"
+        args = "Esse pacote ja existe no sistema!"
 
     @classmethod
-    def pack_exists(cls, pack: str):
-        for i in cls.doc_installer:
-            if i["Package_nm"] == pack: return True
+    def package_exists(cls, pack: str):
+        """Verify if the typed package exists in the database"""
+        a = cls.cursor.execute("select Nm_Pack from Packages;")  # have all the names of the all packages
+        for i in a:
+            if i[0] == pack: return True  # i is type tuple
+        del a
         return False
 
     @classmethod
-    def return_index(cls, pack: str):
-        if not cls.pack_exists(pack): raise cls.PackageNotFound()
-        ind = 0
-        for i in cls.doc_installer:
-            if i["Package_nm"] == pack: break
-            ind += 1
-        return ind
+    def add_package(cls, data: list):
+        """
+        Add a package to the database system, also the user needs to type the command to system execute in installation
+        :param data: [Nm_Package, Command]
+        :return: :None:
+        """
+        if cls.package_exists(data[0]): raise cls.PackageExistsError()
+        a = cls.cursor.execute(f"insert into Packages(Nm_Pack, Command) values ('{data[0]}', '{data[1]}');")
+        cls.connection.commit()
+        del a # to not use many memory part
 
     @classmethod
-    def add_package(cls, data: dict):
-        if cls.pack_exists(data["Package_nm"]): raise cls.PackageExistsError()
-        cls.doc_installer.append(data)
-        cls.faster()
+    def del_package(cls, package: str):
+        """Delete a package from the database. It don't uses the primary key to select."""
+        if not cls.package_exists(package): raise cls.PackageNotFound()
+        a = cls.cursor.execute(f"delete from Packages where Nm_Pack = '{package}';")
+        cls.connection.commit()
+        del a
 
     @classmethod
-    def delete_package(cls, pack: str):
-        if not cls.pack_exists(pack): raise cls.PackageNotFound()
-        ind = cls.return_index(pack)
-        del cls.doc_installer[ind]
-        cls.faster()
+    def alt_packages(cls, package: str, camp: str, vl: str):
+        """Alter a package data, or name or command used"""
+        if not cls.package_exists(package): raise cls.PackageNotFound()
+        a = cls.cursor.execute(f"update  Packages set {camp} = '{vl}' where Nm_Package = '{package}';")
+        del a
+        cls.connection.commit()
 
     @classmethod
-    def alt_package(cls, pack: str, camp: str, vl: str):
-        if not cls.pack_exists(pack): raise cls.PackageNotFound()
-        if camp not in ("Package_nm", "Command"): raise cls.UnfiledCamp()
-        ind = cls.return_index(pack)
-        cls.doc_installer[ind][camp] = vl
-        cls.faster()
-
-    @classmethod
-    def query_pack(cls, vl: str, camp_req="--all", param="none"):
-        if camp_req not in ("Package_nm", "Command") or param not in ("Package_nm", "Command"): raise cls.UnfiledCamp()
-        rs = []
-        if param == "none":
-            if camp_req == "--all": rs = cls.doc_installer
-            else:
-                for i in cls.doc_installer: rs.append(i[camp_req])
+    def query_package(cls, vl: Optional[str], camp="--all", param="--none"):
+        """
+        Does a query in the database, if all the values: camp, param; was default values, it don't uses vl param
+        """
+        # a = []
+        if param == "--none":
+            if camp == "--all": a = cls.cursor.execute("select * from Packages;")
+            else:a = cls.cursor.execute(f"select {camp} from Packages;")
         else:
-            if camp_req == "--all":
-                for i in cls.doc_installer:
-                    if i[param] == vl: rs.append(i)
-            else:
-                for i in cls.doc_installer:
-                    if i[param] == vl: rs.append(i[camp_req])
-        return rs
+            if camp == "--all": a= cls.cursor.execute(f"select * from Packages where {param} = '{vl}';")
+            else: a = cls.cursor.execute(f"select {camp} from Packages where {param} = '{vl}';")
+        return a
 
     @classmethod
-    def install_package(cls, pack="--all"):
-        if pack == "--all":
-            for i in cls.doc_installer:
-                system(i["Command"])
+    def install_package(cls, package="--all"):
+        """Install the typed package, if it's not defined, install all packages in database"""
+        if package == "--all":
+            a = cls.cursor.execute("select Command from Packages;")
+            for i in a.fetchall():
+                b = system(i[0])
+                del b
+            del a
         else:
-            if not cls.pack_exists(pack): raise cls.PackageNotFound()
-            ind = cls.return_index(pack)
-            system(cls.doc_installer[ind]["Command"])
+            if not cls.package_exists(package): raise cls.PackageNotFound()
+            a = cls.cursor.execute(f"select Command from Packages where Nm_Package = '{package}';")
+            b = system(a.fetchall()[0][0])
+            del b, a
 
 
 class Gitter(Database):
-    doc_gitter = list()
-
-    @classmethod
-    def __init_subclass__(cls): cls.doc_gitter = cls.document[1]["Gitter"]
-
-    @classmethod
-    def faster(cls): cls.union_doc({"Gitter": cls.doc_gitter}, 1)
+    __doc__ = """
+    This class works with the git repositories in the database.
+    """
 
     class RepositoryNotFound(Exception):
-        args = "Esse repositorio nao pode ser encontrado!"
+        """If the typed repository was not found"""
+        args = "Esse repositorio nao esta no banco de dados!"
 
     class RepositoryExistsError(Exception):
-        args = "Esse repositorio ja existe"
-
-    class UnfiledCamp(Exception):
-        args = "Esse campo nao eh valido"
+        """If the typed repository already exists to not have duplicate data"""
+        args = "Esse repositorio ja existe no banco de dados!"
 
     @classmethod
     def repo_exists(cls, repo: str):
-        for i in cls.doc_gitter:
-            if i["Name"] == repo: return True
+        """
+        Verify if repository exists in database.
+        :param: repo is not optional.
+        :var: s is deleted after the query
+        """
+        s = cls.cursor.execute(f"select Nm_Git from Gits;")
+        for i in s:
+            if i[0] == repo: return True
+        del s
         return False
 
     @classmethod
-    def return_index(cls, repo: str):
+    def add_repo(cls, data: list):
+        """
+        Add a repository in the database.
+        :param: data = [Git name, Host, Remote name, Email user, Name user]
+        """
+        if cls.repo_exists(data[0]): raise cls.RepositoryExistsError()
+        b = cls.cursor.execute("insert into Gits (Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser) values (?,?,?,?,?);"
+                               , data)
+        del b
+        cls.connection.commit()
+
+    @classmethod
+    def del_repo(cls, repo: str):
+        """Delete a repository from the database"""
         if not cls.repo_exists(repo): raise cls.RepositoryNotFound()
-        ind = 0
-        for i in cls.doc_gitter:
-            if i["Name"] == repo: break
-            ind += 1
-        return ind
+        a = cls.cursor.execute(f"delete from Gits where Nm_Git = '{repo}';")
+        del a
+        cls.connection.commit()
 
     @classmethod
-    def add_repo(cls, data: dict):
-        n = data["Host"].split("/")
-        data["Name"] = n[-1]
-        if cls.repo_exists(data["Name"]): raise cls.RepositoryExistsError()
-        cls.doc_gitter.append(data)
-        cls.faster()
-
-    @classmethod
-    def delete_repo(cls, repo: str):
+    def alt_repo(cls, repo: str, camp: str, vl):
+        """Alter a database repo"""
         if not cls.repo_exists(repo): raise cls.RepositoryNotFound()
-        ind = cls.return_index(repo)
-        del cls.doc_gitter[ind]
-        cls.faster()
+        b = cls.cursor.execute(f"update Gits set {camp} = '{vl}' where Nm_Git = '{repo}';")
+        del b
+        cls.connection.commit()
 
     @classmethod
-    def alt_repo(cls, repo: str, camp: str, vl: str):
-        if not cls.repo_exists(repo): raise cls.RepositoryNotFound()
-        if not camp in ("RemoteName", "Host", "Name", "EmailUser", "NameUser"):
-            raise cls.UnfiledCamp()
-        ind = cls.return_index(repo)
-        cls.doc_gitter[ind][camp] = vl
-        cls.faster()
-
-    @classmethod
-    def query_repo(cls, vl: str, camp_req="--all", param="none"):
-        if camp_req or param not in ("RemoteName", "Host", "Name", "EmailUser", "NameUser", "--all", "none"):
-            raise cls.UnfiledCamp()
-        rs = []
-        if param == "none":
-            if camp_req == "--all": rs = cls.doc_gitter
-            else:
-                for i in cls.doc_gitter: rs.append(i[camp_req])
+    def query_repo(cls, vl_param: Optional[Any], camp_req="--all", camp_param="--none"):
+        """Realises a database query"""
+        # rs = []
+        if camp_param == "--none":
+            if camp_req == "--all": rs = cls.cursor.execute("select * from Gits;").fetchall()
+            else: rs = cls.cursor.execute(f"select {camp_req} from Gits;").fetchall()
         else:
             if camp_req == "--all":
-                for i in cls.doc_gitter:
-                    if i[param] == vl: rs.append(i)
+                rs = cls.cursor.execute(f"select * from Gits where {camp_param} = '{vl_param}';").fetchall()
             else:
-                for i in cls.doc_gitter:
-                    if i[param] == vl: rs.append(i[camp_req])
-        return False
+                rs = cls.cursor.execute(f"select {camp_req} from Gits where {camp_param} = '{vl_param}';").fetchall()
+        return rs
 
     @classmethod
-    def configure_repo(cls, repo="--all"):
+    def config_repo(cls, repo="--all"):
+        """Configure the repositories"""
         if repo == "--all":
-            for i in cls.doc_gitter:
-                a = system("git clone "+i["Host"])
+            all_ = cls.cursor.execute("select * from Gits;")
+            for i in all_.fetchall():
+                a = system("git clone "+i[2])
                 del a
-                chdir(i["Name"])
-                a = system("git remote add "+i["RemoteName"]+" "+i["Host"])
+                chdir(i[1])
+                a = system("git remote add "+i[3]+" "+i[2])
                 del a
-                a = system("git config --global user.name = "+i["NameUser"])
+                a = system("git config --global user.name = "+i[5])
                 del a
-                a = system("git config --global user.email = "+i["EmailUser"])
+                a = system("git config --global user.email = "+i[4])
                 del a
                 chdir("..")
         else:
             if not cls.repo_exists(repo): raise cls.RepositoryNotFound()
-            ind = cls.return_index(repo)
-            a = system("git clone "+cls.doc_gitter[ind]["Host"])
+            all_ = cls.cursor.execute(f"select * from Gits where Nm_Git = '{repo}';").fetchall()[0]
+            a = system("git clone "+all_[2])
             del a
-            chdir(cls.doc_gitter[ind]["Name"])
-            a = system("git remote add "+cls.doc_gitter[ind]["RemoteName"]+" "+cls.doc_gitter[ind]["Host"])
+            chdir("git clone "+all_[1])
+            a = system("git remote add "+all_[3]+" "+all_[2])
             del a
-            a = system("git config --global user.name = "+cls.doc_gitter[ind]["NameUser"])
+            a = system("git config --global user.name = "+all_[5])
             del a
-            a = system("git config --global user.email = "+cls.doc_gitter[ind]["EmailUser"])
+            a = system("git config --global user.email = "+all_[4])
             del a
             chdir("..")
 
 
-class Configurations(Database):
-    doc_config = dict()
 
-    @classmethod
-    def __init_subclass__(cls): cls.doc_config = cls.document[2]["Config"]
+
+
+
+
+
+
+
+
 
 
 
