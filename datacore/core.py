@@ -2,8 +2,6 @@
 # using namespace std
 import sqlite3
 from os import system, chdir
-from typing import Optional, Any
-
 
 
 __doc__ = """
@@ -81,23 +79,14 @@ class Installer(Database):
     def alt_packages(cls, package: str, camp: str, vl: str):
         """Alter a package data, or name or command used"""
         if not cls.package_exists(package): raise cls.PackageNotFound()
-        a = cls.cursor.execute(f"update  Packages set {camp} = '{vl}' where Nm_Package = '{package}';")
+        a = cls.cursor.execute(f"update  Packages set {camp} = '{vl}' where Nm_Pack = '{package}';")
         del a
         cls.connection.commit()
 
     @classmethod
-    def query_package(cls, vl: Optional[str], camp="--all", param="--none"):
-        """
-        Does a query in the database, if all the values: camp, param; was default values, it don't uses vl param
-        """
-        # a = []
-        if param == "--none":
-            if camp == "--all": a = cls.cursor.execute("select * from Packages;")
-            else:a = cls.cursor.execute(f"select {camp} from Packages;")
-        else:
-            if camp == "--all": a= cls.cursor.execute(f"select * from Packages where {param} = '{vl}';")
-            else: a = cls.cursor.execute(f"select {camp} from Packages where {param} = '{vl}';")
-        return a
+    def query_package(cls): # todo: retirar sistema de querys e colocar so pra mostrar o banco de dados.
+        """"""
+        return cls.cursor.execute("select Nm_Pack, Command from Packages;")
 
     @classmethod
     def install_package(cls, package="--all"):
@@ -110,8 +99,9 @@ class Installer(Database):
             del a
         else:
             if not cls.package_exists(package): raise cls.PackageNotFound()
-            a = cls.cursor.execute(f"select Command from Packages where Nm_Package = '{package}';")
+            a = cls.cursor.execute(f"select Command from Packages where Nm_Pack = '{package}';")
             b = system(a.fetchall()[0][0])
+            print(b)
             del b, a
 
 
@@ -170,25 +160,19 @@ class Gitter(Database):
         cls.connection.commit()
 
     @classmethod
-    def query_repo(cls, vl_param: Optional[Any], camp_req="--all", camp_param="--none"):
-        """Realises a database query"""
-        # rs = []
-        if camp_param == "--none":
-            if camp_req == "--all": rs = cls.cursor.execute("select * from Gits;").fetchall()
-            else: rs = cls.cursor.execute(f"select {camp_req} from Gits;").fetchall()
-        else:
-            if camp_req == "--all":
-                rs = cls.cursor.execute(f"select * from Gits where {camp_param} = '{vl_param}';").fetchall()
-            else:
-                rs = cls.cursor.execute(f"select {camp_req} from Gits where {camp_param} = '{vl_param}';").fetchall()
-        return rs
+    def query_repo(cls):
+        """
+        It takes all the data in the database, raising only the repository name, the host, the remote name
+        """
+        return cls.cursor.execute("select Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser from Gits;")
 
     @classmethod
-    def config_repo(cls, repo="--all"):
+    def config_repo(cls, repo="--all", dir_to_clone="pwd"):
         """Configure the repositories"""
         if repo == "--all":
             all_ = cls.cursor.execute("select * from Gits;")
             for i in all_.fetchall():
+                if dir_to_clone != "pwd": chdir(dir_to_clone)
                 a = system("git clone "+i[2])
                 del a
                 chdir(i[1])
@@ -204,7 +188,7 @@ class Gitter(Database):
             all_ = cls.cursor.execute(f"select * from Gits where Nm_Git = '{repo}';").fetchall()[0]
             a = system("git clone "+all_[2])
             del a
-            chdir("git clone "+all_[1])
+            chdir(all_[1])
             a = system("git remote add "+all_[3]+" "+all_[2])
             del a
             a = system("git config --global user.name = "+all_[5])
