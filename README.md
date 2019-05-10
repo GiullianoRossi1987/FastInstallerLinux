@@ -48,7 +48,7 @@ in the python file core.py
     This shell script have all the needed configurations.  
     Also it installs all the requirements, and  it installs the library sqlite3 for python2.* and
     python3.*.
-    To start this you type ``./datacore/configure_requirements.sh``.  
+    To start this you type ```./datacore/configure_requirements.sh```.  
     If says PermissionError, type ``sudo chmod 777 /datacore/configure.sh``. And try again.
 2. #### To configure it is simple   
     To configure it with alias words in your linux just initialize the file init.sh and now try 
@@ -56,8 +56,18 @@ in the python file core.py
     If it don't. Just go to the directory where's the system directory and type ``python3 intaller.py``.  
     If you are in python version 2, just type ``python2 installer.py``, and that will start.
 
-# News!
-## Alpha released! 
+# News
+## Alpha released
+The first version was released today! 10/05/2019 or 2019/05/10, friday!.
+#### What's comming now?
+For the next version (1.0) I'm looking for these features:
+1. #### Support terminal args
+    Yes, in the next version. But maybe not, because it's a lot of commands and options to use in this database, but who knows.
+2. #### Backup the database
+    Maybe the new version we'll have a backup of database in a json, and a selectable file for the database!
+3. #### Most Configurable
+    It'll have most options to configure in database. Like standard git hub account.
+    
     
    
     
