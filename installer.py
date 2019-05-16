@@ -3,13 +3,35 @@
 from datacore import core
 from time import sleep
 
-# todo: realizar os primeiros testes
 
 database = core.Database()  # a bit useless but who knows
 Installer = core.Installer()
 Gitter = core.Gitter()
 
-__doc__ = """testing help"""   # todo: Fazer esquema de ajuda
+__doc__ = """
+FastInstallerLinux: This is a fast, easy and simple database to save your favorites tools, github repositories,
+install and clone it.
+
+At the first screen you have four options: 
+1- Installer : It goes to the Installer options.
+2- Gitter: It goes to git database options.
+3- Help: show this helpful message.
+4- Exit: Exit system.
+
+In the Installer options you have seven options:
+1 - Install Package: it installs a package from database. IT NEEDS TO BE IN THE DATABASE!
+2 - Install All Packages: it install all packages from database.
+3 - Add package: It adds a package to database
+    You have to type what's the package name, and him command to install.
+4 - Delete package: It delete a package in database
+5 - Alter Package: It alter an package in database.
+    You have to type what's the package, using him name, the camp and the new value to the camp.
+6 - See all the packages: It show's you all the packages and it commands in database.
+7 - Exit to the first screen.
+
+In the Gitter options you have also 7 options:
+1 - Configure repository: Configure a repository in the database. 
+"""   # todo: Fazer esquema de ajuda
 
 while True:
     while True:  # main menu
