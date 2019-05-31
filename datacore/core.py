@@ -10,6 +10,8 @@ The database use only two tables on the database: database.db
 And it have all the important and used data for configure repositories and download packages.
 """
 
+__version__  = 0.3
+
 
 class Database(object):
     __doc__ = """
@@ -47,7 +49,7 @@ class Installer(Database):
         args = "Esse pacote ja existe no sistema!"
 
     @classmethod
-    def package_exists(cls, pack: str):
+    def package_exists(cls, pack: str) -> bool:
         """Verify if the typed package exists in the database"""
         a = cls.cursor.execute("select Nm_Pack from Packages;")  # have all the names of the all packages
         for i in a:
@@ -84,9 +86,9 @@ class Installer(Database):
         cls.connection.commit()
 
     @classmethod
-    def query_package(cls): # todo: retirar sistema de querys e colocar so pra mostrar o banco de dados.
+    def query_package(cls) -> list: # todo: retirar sistema de querys e colocar so pra mostrar o banco de dados.
         """"""
-        return cls.cursor.execute("select Nm_Pack, Command from Packages;")
+        return cls.cursor.execute("select Nm_Pack, Command from Packages;").fetchall()
 
     @classmethod
     def install_package(cls, package="--all"):
@@ -119,7 +121,7 @@ class Gitter(Database):
         args = "Esse repositorio ja existe no banco de dados!"
 
     @classmethod
-    def repo_exists(cls, repo: str):
+    def repo_exists(cls, repo: str) -> bool:
         """
         Verify if repository exists in database.
         :param: repo is not optional.
@@ -152,7 +154,7 @@ class Gitter(Database):
         cls.connection.commit()
 
     @classmethod
-    def alt_repo(cls, repo: str, camp: str, vl):
+    def alt_repo(cls, repo: str, camp: str, vl: str):
         """Alter a database repo"""
         if not cls.repo_exists(repo): raise cls.RepositoryNotFound()
         b = cls.cursor.execute(f"update Gits set {camp} = '{vl}' where Nm_Git = '{repo}';")
@@ -160,11 +162,12 @@ class Gitter(Database):
         cls.connection.commit()
 
     @classmethod
-    def query_repo(cls):
+    def query_repo(cls) -> list:
         """
         It takes all the data in the database, raising only the repository name, the host, the remote name
         """
-        return cls.cursor.execute("select Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser from Gits;")
+        return cls.cursor.execute("select Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser from Gits;").fetchall()
+
 
     @classmethod
     def config_repo(cls, repo="--all", dir_to_clone="pwd"):
