@@ -2,6 +2,17 @@
 # using namespace std
 import sqlite3
 from os import system, chdir
+from datetime import date, datetime
+
+
+
+
+def get_date_time() -> list:
+    return [
+        "{}/{}/{}".format(date.today().day, date.today().month, date.today().year),
+        "{}:{}".format(datetime.now().hour, datetime.now().minute)
+    ]
+
 
 
 __doc__ = """
@@ -18,13 +29,13 @@ class Database(object):
     The all classes core, where's declared the database connection, and it's cursor.
     Without this class the system's nothing.
     """
-    connection = sqlite3.connect("", timeout=10)
+    connection = sqlite3.connect("database.db", timeout=10)
     cursor = connection.cursor()
     closed = bool
 
-    def __init__(self, file_data="datacore/database.db"):
+    def __init__(self):
         """Start the connection and declare the cursor.Maybe not useful. But there is it."""
-        self.connection = sqlite3.connect(file_data)
+        self.connection = sqlite3.connect("database.db")
         self.cursor = self.connection.cursor()
         self.closed = False
 
@@ -36,6 +47,8 @@ class Database(object):
 
 
 class Installer(Database):
+
+    __logs = []
 
     __doc__ = """
     This class works only with the Packages table. It have functions and procedures for the packages management
@@ -69,6 +82,8 @@ class Installer(Database):
         a = cls.cursor.execute(f"insert into Packages(Nm_Pack, Command) values ('{data[0]}', '{data[1]}');")
         cls.connection.commit()
         del a # to not use many memory part
+        cls.__logs.append((get_date_time()[0], get_date_time()[1], "AddTO", data[0]))
+
 
     @classmethod
     def del_package(cls, package: str):
@@ -77,6 +92,7 @@ class Installer(Database):
         a = cls.cursor.execute(f"delete from Packages where Nm_Pack = '{package}';")
         cls.connection.commit()
         del a
+        cls.__logs.append((get_date_time()[0], get_date_time()[1], "DEL", package))
 
     @classmethod
     def alt_packages(cls, package: str, camp: str, vl: str):
@@ -85,6 +101,7 @@ class Installer(Database):
         a = cls.cursor.execute(f"update  Packages set {camp} = '{vl}' where Nm_Pack = '{package}';")
         del a
         cls.connection.commit()
+        cls.__logs.append((get_date_time()[0], get_date_time()[1], "ALT", package, camp, vl))
 
     @classmethod
     def query_package(cls) -> list: # todo: retirar sistema de querys e colocar so pra mostrar o banco de dados.
@@ -106,9 +123,20 @@ class Installer(Database):
             b = system(a.fetchall()[0][0])
             print(b)
             del b, a
+        cls.__logs.append((get_date_time()[0], get_date_time()[1], "DOW", package))
+
+    @classmethod
+    def export_logs_to_str(cls) -> str:
+        n = ""
+        for i in cls.__logs:
+            s = ("\b"*4).join(i) + "\n"
+            n += s
+        return n
 
 
 class Gitter(Database):
+
+    __logs = []
     __doc__ = """
     This class works with the git repositories in the database.
     """
@@ -145,6 +173,7 @@ class Gitter(Database):
                                , data)
         del b
         cls.connection.commit()
+        cls.__logs.append((get_date_time()[0], get_date_time()[1], "ADD", data[0]))
 
     @classmethod
     def del_repo(cls, repo: str):
@@ -153,6 +182,7 @@ class Gitter(Database):
         a = cls.cursor.execute(f"delete from Gits where Nm_Git = '{repo}';")
         del a
         cls.connection.commit()
+        cls.__logs.append((get_date_time()[0], get_date_time()[1], "DEL", repo))
 
     @classmethod
     def alt_repo(cls, repo: str, camp: str, vl: str):
@@ -161,6 +191,7 @@ class Gitter(Database):
         b = cls.cursor.execute(f"update Gits set {camp} = '{vl}' where Nm_Git = '{repo}';")
         del b
         cls.connection.commit()
+        cls.__logs.append((get_date_time()[0], get_date_time()[1], "ALT", repo, camp, vl))
 
     @classmethod
     def query_repo(cls) -> list:
@@ -200,6 +231,16 @@ class Gitter(Database):
             a = system("git config --global user.email = "+all_[4])
             del a
             chdir("..")
+        cls.__logs.append((get_date_time()[0], get_date_time()[1], "CON", repo, dir_to_clone))
+
+
+    @classmethod
+    def export_logs_str(cls) -> str:
+        s = ""
+        for i in cls.__logs:
+            n = ("\b"*4).join(i)
+            s += n
+        return s
 
 
 

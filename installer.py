@@ -2,7 +2,14 @@
 # using namespace std
 from datacore import core
 from time import sleep
+from os import system
+from datacore import argv_system
+from sys import argv
 
+
+if len(argv) > 1:
+    argv_system.ArgvData()
+    exit(0)
 
 database = core.Database()  # a bit useless but who knows
 Installer = core.Installer()
@@ -35,15 +42,8 @@ In the Gitter options you have also 7 options:
 
 while True:
     while True:  # main menu
+        system("figlet Installer")
         print("""
-__________ ____________    ||             ||
-|               ||         ||             ||   
-|========       ||         ||           __||__    
-|               ||         ||           \    /
-|               ||         ||            \  /
-|          _____||_____    ||========  ===\/===
-
------------------------------------------------
 [1]Installer
 [2] Gitter
 [3] Help

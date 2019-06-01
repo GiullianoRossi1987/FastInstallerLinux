@@ -11,7 +11,7 @@ class MainScreen(object):
     gitter_obj = Gitter
 
     def __init__(self):
-        self.gitter_obj.__init__(Type[Gitter], "")
+        self.gitter_obj.__init__(Type[Gitter])
 
         while True:
             while True:

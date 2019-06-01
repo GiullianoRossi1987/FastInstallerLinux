@@ -2,3 +2,4 @@
 .vscode/*
 tester.py
 
+datacore/__pycache__/*
