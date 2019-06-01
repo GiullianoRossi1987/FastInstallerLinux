@@ -202,12 +202,12 @@ class Gitter(Database):
 
 
     @classmethod
-    def config_repo(cls, repo="--all", dir_to_clone="pwd"):
+    def config_repo(cls, repo="--all", dir_to_clone="--pwd"):
         """Configure the repositories"""
+        if dir_to_clone != "--pwd": chdir(dir_to_clone)
         if repo == "--all":
             all_ = cls.cursor.execute("select * from Gits;")
             for i in all_.fetchall():
-                if dir_to_clone != "pwd": chdir(dir_to_clone)
                 a = system("git clone "+i[2])
                 del a
                 chdir(i[1])
