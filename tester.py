@@ -1,4 +1,6 @@
 # todo excluir o arquivo dps
 
-from datacore import core
+from sys import argv
+
+print(type(argv[1]))
 

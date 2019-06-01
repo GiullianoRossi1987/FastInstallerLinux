@@ -18,12 +18,13 @@ class Database(object):
     The all classes core, where's declared the database connection, and it's cursor.
     Without this class the system's nothing.
     """
-    connection = sqlite3.connect("datacore/database.db", timeout=10)
+    connection = sqlite3.connect("", timeout=10)
     cursor = connection.cursor()
     closed = bool
 
-    def __init__(self):
+    def __init__(self, file_data="datacore/database.db"):
         """Start the connection and declare the cursor.Maybe not useful. But there is it."""
+        self.connection = sqlite3.connect(file_data)
         self.cursor = self.connection.cursor()
         self.closed = False
 

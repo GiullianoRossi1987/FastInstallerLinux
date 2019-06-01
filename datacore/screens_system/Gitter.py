@@ -11,7 +11,7 @@ class MainScreen(object):
     gitter_obj = Gitter
 
     def __init__(self):
-        self.gitter_obj.__init__(Type[Gitter])
+        self.gitter_obj.__init__(Type[Gitter], "")
 
         while True:
             while True:
@@ -71,8 +71,7 @@ class MainScreen(object):
                     if r == 3:
                         c = False
                         break
-                    if r == 1:
-                         break
+                    if r == 1: break
                 if c:
                     ls_data = [
                         name,

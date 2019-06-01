@@ -1,6 +1,5 @@
 # FastInstallerLinux
 ### A fast configurable installer tools and github repositories on linux
-#### Or FIL
 
 This system makes all your need easy then enough, you can add your tools to download using the linux terminal.
 Can add yours GitHub Repositories, alter data from your tools and repository. It's for developers,
@@ -18,6 +17,11 @@ the linux terminal, and CLI interface. But it's very easy and useful for all lin
         ``
         sudo apt-get install git
         ``  
+- ### Figlet Installed:
+    It also can be installed going to terminal and typing:  
+    ``
+    sudo apt-get install figlet
+    ``
 - #### Python:
     The version used in the system is **__3.6.5__**, but for older version like **__2.7.2__**,   
     we recommend you to install the sqlite3 library if it is not in your python libs.  
@@ -57,16 +61,21 @@ in the python file core.py
     If you are in python version 2, just type ``python2 installer.py``, and that will start.
 
 # News
-## Alpha released
-The first version was released today! 10/05/2019 or 2019/05/10, friday!.
-#### What's comming now?
-For the next version (1.0) I'm looking for these features:
-1. #### Support terminal args
-    Yes, in the next version. But maybe not, because it's a lot of commands and options to use in this database, but who knows.
-2. #### Backup the database
-    Maybe the new version we'll have a backup of database in a json, and a selectable file for the database!
-3. #### Most Configurable
-    It'll have most options to configure in database. Like standard git hub account.
+# Beta Released!!!
+The Beta Version of the system are released.  
+## Features:
+1. Argv System added!:  
+    Now we support arguments on the terminal, like **--help**  
+    It's experimental, but's a useful feature.
+   
+2. Removed database bug:
+    The database connection was being always interrupted by the system, because the system can't find
+    the .db file, but't was successfully suppressed. Now it works nicely.
+
+## What'll come now?
+1. A easier exportation method to the datase
+
+2. Maybe a Windows Version. But who knows?  
     
     
    
