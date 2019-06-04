@@ -14,7 +14,7 @@ class GitterAnimations(object):
     @classmethod
     def clone_repo(cls, repo: str):
         bar = ProgressBar(widgets=[
-            "[ Cloning Repository "+repo+" ", widgets.Percentage(), " ] ", Bar(fill="#", fill_left=True, marker="!")
+            "[Preparing to Clone Repository "+repo+" ", widgets.Percentage(), " ] ", Bar(fill="#", fill_left=True, marker="!")
         ], maxval=100)
         bar.start()
         for i in bar(range(100)):
@@ -27,14 +27,13 @@ class GitterAnimations(object):
     @classmethod
     def config_repo(cls, repo):
         bar = ProgressBar(widgets=[
-            "[Configuring Repository "+repo+" ", Percentage(), "]", Bar(marker="!", fill="#")
+            "[Preparing to Configure Repository "+repo+" ", Percentage(), "]", Bar(marker="!", fill="#")
         ], maxval=100)
         bar.start()
         for i in bar(range(100)):
             time.sleep(0.2)
             bar.update(i)
         bar.finish()
-
 
     @classmethod
     def add_repo(cls, repo: str):
@@ -86,7 +85,7 @@ class InstallerAnimation(object):
     @classmethod
     def install_pack(cls, pack: str):
         bar = ProgressBar(widgets=[
-            "[Installing " + pack + " ", Percentage(), "]", Bar(marker="!", fill="#")
+            "[Preparing to Install " + pack + " ", Percentage(), "]", Bar(marker="!", fill="#")
         ], maxval=100)
         bar.start()
         for i in bar(range(100)):

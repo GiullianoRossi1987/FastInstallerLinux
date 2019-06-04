@@ -3,7 +3,7 @@
 import sqlite3
 from os import chdir
 from datetime import date, datetime
-from subprocess import check_output
+from os import system as check_output  # gambiarra
 from datacore import annimations_cgi
 
 
