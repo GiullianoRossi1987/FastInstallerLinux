@@ -5,6 +5,7 @@ from time import sleep
 from os import system
 from datacore import argv_system
 from sys import argv
+from datacore import annimations_cgi
 
 
 if len(argv) > 1:
@@ -39,6 +40,9 @@ In the Installer options you have seven options:
 In the Gitter options you have also 7 options:
 1 - Configure repository: Configure a repository in the database. 
 """   # todo: Fazer esquema de ajuda
+
+
+annimations_cgi.GenericSystem.start_all_system()
 
 while True:
     while True:  # main menu

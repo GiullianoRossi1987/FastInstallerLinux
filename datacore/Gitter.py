@@ -4,6 +4,7 @@ from datacore.core import Gitter
 from time import sleep
 from typing import Type
 from os import system
+from datacore.annimations_cgi import GenericSystem
 
 
 class MainScreen(object):
@@ -12,7 +13,7 @@ class MainScreen(object):
 
     def __init__(self):
         self.gitter_obj.__init__(Type[Gitter])
-
+        GenericSystem.start_gitter_system()
         while True:
             while True:
                 system("figlet Gitter")

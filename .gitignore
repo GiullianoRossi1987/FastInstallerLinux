@@ -1,5 +1,5 @@
-.idea/*
-.vscode/*
+.idea
+.vscode
 tester.py
 
-datacore/__pycache__/*
+datacore/__pycache__

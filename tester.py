@@ -1,6 +1,6 @@
 # todo excluir o arquivo dps
 
-from sys import argv
+from datacore import annimations_cgi
 
-print(type(argv[1]))
+annimations_cgi.GitterAnimations.config_repo("teste")
 

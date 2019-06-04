@@ -1,8 +1,10 @@
 # coding = utf-8
 # using namespace std
 import sqlite3
-from os import system, chdir
+from os import chdir
 from datetime import date, datetime
+from subprocess import check_output
+from datacore import annimations_cgi
 
 
 
@@ -82,7 +84,7 @@ class Installer(Database):
         a = cls.cursor.execute(f"insert into Packages(Nm_Pack, Command) values ('{data[0]}', '{data[1]}');")
         cls.connection.commit()
         del a # to not use many memory part
-        cls.__logs.append((get_date_time()[0], get_date_time()[1], "AddTO", data[0]))
+        annimations_cgi.InstallerAnimation.add_pack(data[0])
 
 
     @classmethod
@@ -92,7 +94,7 @@ class Installer(Database):
         a = cls.cursor.execute(f"delete from Packages where Nm_Pack = '{package}';")
         cls.connection.commit()
         del a
-        cls.__logs.append((get_date_time()[0], get_date_time()[1], "DEL", package))
+        annimations_cgi.InstallerAnimation.del_pack(package)
 
     @classmethod
     def alt_packages(cls, package: str, camp: str, vl: str):
@@ -101,11 +103,12 @@ class Installer(Database):
         a = cls.cursor.execute(f"update  Packages set {camp} = '{vl}' where Nm_Pack = '{package}';")
         del a
         cls.connection.commit()
-        cls.__logs.append((get_date_time()[0], get_date_time()[1], "ALT", package, camp, vl))
+        annimations_cgi.InstallerAnimation.alt_pack(package)
 
     @classmethod
     def query_package(cls) -> list: # todo: retirar sistema de querys e colocar so pra mostrar o banco de dados.
         """"""
+        annimations_cgi.InstallerAnimation.show()
         return cls.cursor.execute("select Nm_Pack, Command from Packages;").fetchall()
 
     @classmethod
@@ -114,24 +117,18 @@ class Installer(Database):
         if package == "--all":
             a = cls.cursor.execute("select Command from Packages;")
             for i in a.fetchall():
-                b = system(i[0])
+                pack = cls.cursor.execute(f"select Nm_Pack from Packages where Command = '{i[0]}';").fetchall()[0][0]
+                annimations_cgi.InstallerAnimation.install_pack(pack)
+                b = check_output(i[0])
                 del b
             del a
         else:
             if not cls.package_exists(package): raise cls.PackageNotFound()
             a = cls.cursor.execute(f"select Command from Packages where Nm_Pack = '{package}';")
-            b = system(a.fetchall()[0][0])
+            annimations_cgi.InstallerAnimation.install_pack(package)
+            b = check_output(a.fetchall()[0][0])
             print(b)
             del b, a
-        cls.__logs.append((get_date_time()[0], get_date_time()[1], "DOW", package))
-
-    @classmethod
-    def export_logs_to_str(cls) -> str:
-        n = ""
-        for i in cls.__logs:
-            s = ("\b"*4).join(i) + "\n"
-            n += s
-        return n
 
 
 class Gitter(Database):
@@ -173,7 +170,7 @@ class Gitter(Database):
                                , data)
         del b
         cls.connection.commit()
-        cls.__logs.append((get_date_time()[0], get_date_time()[1], "ADD", data[0]))
+        annimations_cgi.GitterAnimations.add_repo(data[0])
 
     @classmethod
     def del_repo(cls, repo: str):
@@ -182,7 +179,7 @@ class Gitter(Database):
         a = cls.cursor.execute(f"delete from Gits where Nm_Git = '{repo}';")
         del a
         cls.connection.commit()
-        cls.__logs.append((get_date_time()[0], get_date_time()[1], "DEL", repo))
+        annimations_cgi.GitterAnimations.del_repo(repo)
 
     @classmethod
     def alt_repo(cls, repo: str, camp: str, vl: str):
@@ -191,13 +188,14 @@ class Gitter(Database):
         b = cls.cursor.execute(f"update Gits set {camp} = '{vl}' where Nm_Git = '{repo}';")
         del b
         cls.connection.commit()
-        cls.__logs.append((get_date_time()[0], get_date_time()[1], "ALT", repo, camp, vl))
+        annimations_cgi.GitterAnimations.alt_repo(repo)
 
     @classmethod
     def query_repo(cls) -> list:
         """
         It takes all the data in the database, raising only the repository name, the host, the remote name
         """
+        annimations_cgi.GitterAnimations.show()
         return cls.cursor.execute("select Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser from Gits;").fetchall()
 
 
@@ -208,39 +206,34 @@ class Gitter(Database):
         if repo == "--all":
             all_ = cls.cursor.execute("select * from Gits;")
             for i in all_.fetchall():
-                a = system("git clone "+i[2])
+                a = check_output("git clone "+i[2])
+                annimations_cgi.GitterAnimations.clone_repo(i[1])
                 del a
                 chdir(i[1])
-                a = system("git remote add "+i[3]+" "+i[2])
+                a = check_output("git remote add "+i[3]+" "+i[2])
                 del a
-                a = system("git config --global user.name = "+i[5])
+                a = check_output("git config --global user.name = "+i[5])
                 del a
-                a = system("git config --global user.email = "+i[4])
-                del a
+                a = check_output("git config --global user.email = "+i[4])
+                annimations_cgi.GitterAnimations.config_repo(i[1])
                 chdir("..")
+                del a
         else:
             if not cls.repo_exists(repo): raise cls.RepositoryNotFound()
             all_ = cls.cursor.execute(f"select * from Gits where Nm_Git = '{repo}';").fetchall()[0]
-            a = system("git clone "+all_[2])
+            a = check_output("git clone "+all_[2])
             del a
             chdir(all_[1])
-            a = system("git remote add "+all_[3]+" "+all_[2])
+            a = check_output("git remote add "+all_[3]+" "+all_[2])
             del a
-            a = system("git config --global user.name = "+all_[5])
+            a = check_output("git config --global user.name = "+all_[5])
             del a
-            a = system("git config --global user.email = "+all_[4])
-            del a
+            a = check_output("git config --global user.email = "+all_[4])
             chdir("..")
-        cls.__logs.append((get_date_time()[0], get_date_time()[1], "CON", repo, dir_to_clone))
+            del a
+        annimations_cgi.GitterAnimations.clone_repo(repo)
 
 
-    @classmethod
-    def export_logs_str(cls) -> str:
-        s = ""
-        for i in cls.__logs:
-            n = ("\b"*4).join(i)
-            s += n
-        return s
 
 
 

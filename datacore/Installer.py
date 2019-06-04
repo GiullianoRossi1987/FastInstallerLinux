@@ -4,6 +4,7 @@ from datacore.core import Installer
 from os import system
 from typing import Type
 from time import sleep
+from datacore.annimations_cgi import GenericSystem
 
 
 class MainScreen(object):
@@ -12,6 +13,7 @@ class MainScreen(object):
 
     def __init__(self):
         self.installer_obj.__init__(Type[Installer])
+        GenericSystem.start_installer_system()
         while True:
             while True:
                 system("figlet Installer")
