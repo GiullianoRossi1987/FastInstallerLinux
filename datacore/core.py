@@ -2,20 +2,8 @@
 # using namespace std
 import sqlite3
 from os import chdir
-from datetime import date, datetime
 from os import system as check_output  # gambiarra
 from datacore import annimations_cgi
-
-
-
-
-def get_date_time() -> list:
-    return [
-        "{}/{}/{}".format(date.today().day, date.today().month, date.today().year),
-        "{}:{}".format(datetime.now().hour, datetime.now().minute)
-    ]
-
-
 
 __doc__ = """
 This is the main database system. You can import this file, or easily start the main file (installer.py)
@@ -26,26 +14,30 @@ And it have all the important and used data for configure repositories and downl
 __version__  = 0.3
 
 
+
 class Database(object):
     __doc__ = """
     The all classes core, where's declared the database connection, and it's cursor.
     Without this class the system's nothing.
+    :connection: connect to the database
     """
-    connection = sqlite3.connect("database.db", timeout=10)
+    connection = sqlite3.connect("./datacore/database.db", timeout=10)
     cursor = connection.cursor()
     closed = bool
+    started = bool
 
     def __init__(self):
         """Start the connection and declare the cursor.Maybe not useful. But there is it."""
-        self.connection = sqlite3.connect("database.db")
-        self.cursor = self.connection.cursor()
         self.closed = False
+        self.started = True
+
 
     def close(self):
         """Closes the connection and the cursor, also it alerts the system there was a closed connection"""
         self.cursor.close()
         self.connection.close()
         self.closed = True
+
 
 
 class Installer(Database):
@@ -85,6 +77,8 @@ class Installer(Database):
         cls.connection.commit()
         del a # to not use many memory part
         annimations_cgi.InstallerAnimation.add_pack(data[0])
+
+
 
 
     @classmethod
@@ -128,12 +122,27 @@ class Installer(Database):
             annimations_cgi.InstallerAnimation.install_pack(package)
             b = check_output(a.fetchall()[0][0])
             print(b)
-            del b, a
+            del a,b
+
+    # not attached
+    
+    # @classmethod
+    # def export_data_command(cls, package="--all") -> list:
+    #     if package == "--all":
+    #         return_val_ls = []
+    #         a = cls.cursor.execute("select Nm_Pack from Package;")
+    #         for i in a.fetchall():
+    #             command = cls.cursor.execute(f"select Command from Packages where Nm_Pack = '{i[0]}';")
+    #             return_val_ls.append(command.fetchone()[0])
+    #         return return_val_ls
+    #     else:
+    #         command = cls.cursor.execute(f"select Command from Packages where Nm_Pack = '{package}';")
+    #         return command.fetchone()
+            
 
 
 class Gitter(Database):
 
-    __logs = []
     __doc__ = """
     This class works with the git repositories in the database.
     """
@@ -232,6 +241,45 @@ class Gitter(Database):
             chdir("..")
             del a
         annimations_cgi.GitterAnimations.clone_repo(repo)
+
+
+# Not attach
+#     @classmethod
+#     def export_data_commands(cls, git="--all") -> list:
+#         return_ls = []
+#         if git == "--all":
+#             a = cls.cursor.execute("select Nm_git from Gits;")
+#             for item in a.fetchall():
+#                 data_from_item = cls.cursor.execute(f"select * from Gits where Nm_Git = '{item}';").fetchone()
+#                 return_ls .append(f"""
+# # from {item[0]}
+# echo 'Configuring {item[0]}'
+# git clone {data_from_item[2]}
+# cd {item}
+# git remote add {data_from_item[3]}
+# git config --global user.email = {data_from_item[4]}
+# git config --global user.name = {data_from_item[5]}
+# echo 'Finished configuring {item[0]}'
+#                 """)
+#             return return_ls
+#         else:
+#             if not cls.repo_exists(git): raise cls.RepositoryNotFound()
+#             query_to = cls.cursor.execute(f"select * from Gits where Nm_Git = '{git}';").fetchone()
+#             return_ls += [
+#                 f"echo 'Configuring {git}'",
+#                 f"git clone {query_to[2]}",
+#                 f"cd {git}",
+#                 f"git remote add {query_to[3]}",
+#                 f"git config --global user.name = {query_to[5]}",
+#                 f"git config --global user.email = {query_to[4]}",
+#                 f"echo 'Finished to configuring {git}'"
+#             ]
+#         return return_ls
+
+
+
+
+
 
 
 

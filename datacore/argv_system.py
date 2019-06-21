@@ -1,8 +1,9 @@
-# coding = utf=8
+# coding = utf-8
 # using namespace std
 from datacore import Gitter, Installer
 from datacore import core as DataBaseActions
 from sys import argv
+
 
 
 class ArgvData(object):
@@ -10,10 +11,10 @@ class ArgvData(object):
     __help__ = """"""
 
     oficial_argvs = (
-        "-I", "-G", "--all", "-a", "-d", "-l", "-s", "-i", "-c", "--help", "-o", "-pwd", "--all"
+        "-I", "-G", "--all", "-a", "-d", "-l", "-s", "-i", "-c", "--help", "-o", "-pwd", "--all", "-Sl"
     )
 
-    class InvalidArgv(Exception):
+    class InvalidArgv(BaseException):
         args = "This is not a valid argv.\nIf you need help type -h"
 
 
@@ -59,6 +60,8 @@ class ArgvData(object):
                 raise cls.InvalidArgv()
         elif data[1] == "-v":
             print(DataBaseActions.__version__)
+        elif data[1] == "-E":
+            pass # exportation options
         else:
             raise cls.InvalidArgv()
 

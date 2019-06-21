@@ -6,6 +6,7 @@ from os import system
 from datacore import argv_system
 from sys import argv
 from datacore import annimations_cgi
+from datacore.backup_maker import DatabaseToBackup
 
 
 if len(argv) > 1:
@@ -43,6 +44,7 @@ In the Gitter options you have also 7 options:
 
 
 annimations_cgi.GenericSystem.start_all_system()
+back = DatabaseToBackup()
 
 while True:
     while True:  # main menu
@@ -255,7 +257,9 @@ while True:
         print(__doc__)
         input("<<press any button to return to menu>>")
         continue
-    elif op1 == 4: exit(0)
+    elif op1 == 4:
+        back.update_backup()
+        exit(0)
 
 
 
