@@ -5,6 +5,7 @@ from time import sleep
 from typing import Type
 from os import system
 from datacore.annimations_cgi import GenericSystem
+from datacore.beauty import GitterBeauty
 
 
 class MainScreen(object):
@@ -16,6 +17,7 @@ class MainScreen(object):
         GenericSystem.start_gitter_system()
         while True:
             while True:
+                system("clear")
                 system("figlet Gitter")
                 print("""
 [1] Configure Repository
@@ -116,12 +118,11 @@ class MainScreen(object):
                     sleep(2)
                 continue
             elif op1 == 6:
-                sleep(2)
-                s = ""
-                for i in self.gitter_obj.query_repo():
-                    n = ("\b"*4).join(i)
-                    s += n
-                print(s)
+                rs = GitterBeauty.shows_all_data(self.gitter_obj.query_repo())
+                if len(rs) <= 0:
+                    print("There's no repositories here!")
+                else:
+                    print(rs)
                 input("<<press any button to return>>")
                 continue
             elif op1 == 7:

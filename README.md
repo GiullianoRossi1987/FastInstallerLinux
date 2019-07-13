@@ -61,21 +61,24 @@ in the python file core.py
     If you are in python version 2, just type ``python2 installer.py``, and that will start.
 
 # News
-# Beta Released!!!
-The Beta Version of the system are released.  
+# V 1.0 released!
+A new version came to the GitHub!  
 ## Features:
-1. Argv System added!:  
-    Now we support arguments on the terminal, like **--help**  
-    It's experimental, but's a useful feature.
+1. Beauty appears!  
+    This new feature makes the interface a bit better! Showing the packages data like a directory tree.
    
 2. Removed database bug:
     The database connection was being always interrupted by the system, because the system can't find
     the .db file, but't was successfully suppressed. Now it works nicely.
+   
+3. Backup Maker.  
+    Always after a execution a backup from the database'll appears in ./public_backup, as a .db file.
 
 ## What'll come now?
 1. A easier exportation method to the datase
 
-2. Maybe a Windows Version. But who knows?  
+## Windows Version!  
+   Will be a windows version, that will downloads, at the end of the project I'll send the link to the repository.
     
     
    

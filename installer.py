@@ -15,7 +15,7 @@ if len(argv) > 1:
     argv_system.ArgvData()
     exit(0)
 
-database = core.Database()  # a bit useless but who knows
+database = core.Database()
 Installer = core.Installer()
 Gitter = core.Gitter()
 
@@ -30,7 +30,7 @@ At the first screen you have four options:
 4- Exit: Exit system.
 
 In the Installer options you have seven options:
-1 - Install Package: it installs a package from database. IT NEEDS TO BE IN THE DATABASE!
+1 - Install Package: it installs a package from database. THIS PACKAGE NEEDS TO BE IN THE DATABASE!
 2 - Install All Packages: it install all packages from database.
 3 - Add package: It adds a package to database
     You have to type what's the package name, and him command to install.
@@ -41,8 +41,9 @@ In the Installer options you have seven options:
 7 - Exit to the first screen.
 
 In the Gitter options you have also 7 options:
-1 - Configure repository: Configure a repository in the database. 
-"""   # todo: Fazer esquema de ajuda
+1 - Configure repository: Configure a repository in the database.
+2 - Configure all the repositories in the database. 
+"""
 
 
 annimations_cgi.GenericSystem.start_all_system()

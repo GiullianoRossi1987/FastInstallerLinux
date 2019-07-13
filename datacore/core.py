@@ -2,7 +2,7 @@
 # using namespace std
 import sqlite3
 from os import chdir
-from os import system as check_output  # gambiarra
+from os import system as check_output
 from datacore import annimations_cgi
 
 __doc__ = """
@@ -29,7 +29,6 @@ class Database(object):
         """Start the connection and declare the cursor.Maybe not useful. But there is it."""
         self.closed = False
         self.started = True
-
 
     def close(self):
         """Closes the connection and the cursor, also it alerts the system there was a closed connection"""
@@ -98,7 +97,7 @@ class Installer(Database):
         annimations_cgi.InstallerAnimation.alt_pack(package)
 
     @classmethod
-    def query_package(cls) -> list: # todo: retirar sistema de querys e colocar so pra mostrar o banco de dados.
+    def query_package(cls) -> list:
         """"""
         annimations_cgi.InstallerAnimation.show()
         return cls.cursor.execute("select Nm_Pack, Command from Packages;").fetchall()
@@ -188,7 +187,6 @@ class Gitter(Database):
         """
         annimations_cgi.GitterAnimations.show()
         return cls.cursor.execute("select Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser from Gits;").fetchall()
-
 
     @classmethod
     def config_repo(cls, repo="--all", dir_to_clone="--pwd"):
