@@ -11,8 +11,7 @@ The database use only two tables on the database: database.db
 And it have all the important and used data for configure repositories and download packages.
 """
 
-__version__  = 0.3
-
+__version__  = 0.4
 
 
 class Database(object):
@@ -37,7 +36,6 @@ class Database(object):
         self.cursor.close()
         self.connection.close()
         self.closed = True
-
 
 
 class Installer(Database):
@@ -123,22 +121,6 @@ class Installer(Database):
             b = check_output(a.fetchall()[0][0])
             print(b)
             del a,b
-
-    # not attached
-    
-    # @classmethod
-    # def export_data_command(cls, package="--all") -> list:
-    #     if package == "--all":
-    #         return_val_ls = []
-    #         a = cls.cursor.execute("select Nm_Pack from Package;")
-    #         for i in a.fetchall():
-    #             command = cls.cursor.execute(f"select Command from Packages where Nm_Pack = '{i[0]}';")
-    #             return_val_ls.append(command.fetchone()[0])
-    #         return return_val_ls
-    #     else:
-    #         command = cls.cursor.execute(f"select Command from Packages where Nm_Pack = '{package}';")
-    #         return command.fetchone()
-            
 
 
 class Gitter(Database):
@@ -241,84 +223,6 @@ class Gitter(Database):
             chdir("..")
             del a
         annimations_cgi.GitterAnimations.clone_repo(repo)
-
-
-# Not attach
-#     @classmethod
-#     def export_data_commands(cls, git="--all") -> list:
-#         return_ls = []
-#         if git == "--all":
-#             a = cls.cursor.execute("select Nm_git from Gits;")
-#             for item in a.fetchall():
-#                 data_from_item = cls.cursor.execute(f"select * from Gits where Nm_Git = '{item}';").fetchone()
-#                 return_ls .append(f"""
-# # from {item[0]}
-# echo 'Configuring {item[0]}'
-# git clone {data_from_item[2]}
-# cd {item}
-# git remote add {data_from_item[3]}
-# git config --global user.email = {data_from_item[4]}
-# git config --global user.name = {data_from_item[5]}
-# echo 'Finished configuring {item[0]}'
-#                 """)
-#             return return_ls
-#         else:
-#             if not cls.repo_exists(git): raise cls.RepositoryNotFound()
-#             query_to = cls.cursor.execute(f"select * from Gits where Nm_Git = '{git}';").fetchone()
-#             return_ls += [
-#                 f"echo 'Configuring {git}'",
-#                 f"git clone {query_to[2]}",
-#                 f"cd {git}",
-#                 f"git remote add {query_to[3]}",
-#                 f"git config --global user.name = {query_to[5]}",
-#                 f"git config --global user.email = {query_to[4]}",
-#                 f"echo 'Finished to configuring {git}'"
-#             ]
-#         return return_ls
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

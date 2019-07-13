@@ -5,6 +5,7 @@ from os import system
 from typing import Type
 from time import sleep
 from datacore.annimations_cgi import GenericSystem
+from datacore.beauty import PackagesBeauty
 
 
 class MainScreen(object):
@@ -95,8 +96,7 @@ class MainScreen(object):
                     sleep(2)
                 continue
             elif opc == 6:
-                for i in self.installer_obj.query_package():
-                    print("Package: "+i[0]+" | Command: "+i[1], end="\n")
+                print(PackagesBeauty.shows_all_data(self.installer_obj.query_package()))
                 input("<<press any button to return>>")
                 continue
             elif opc == 7:

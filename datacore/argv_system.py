@@ -3,7 +3,7 @@
 from datacore import Gitter, Installer
 from datacore import core as DataBaseActions
 from sys import argv
-
+from datacore import beauty
 
 
 class ArgvData(object):
@@ -35,8 +35,11 @@ class ArgvData(object):
             elif data[2] == "-o":
                 Installer.MainScreen()
             elif data[2] == "-s":
-                for i in DataBaseActions.Installer.query_package():
-                    print("Package: "+i[0]+"| Command: "+i[1], end="\n")
+                rs = beauty.PackagesBeauty.shows_all_data(DataBaseActions.Installer.query_package())
+                if len(rs) <= 0:
+                    print("There's no packages here!")
+                else:
+                    print(rs)
             else:
                 raise cls.InvalidArgv()
         elif data[1] == "-G":
@@ -51,8 +54,11 @@ class ArgvData(object):
             elif data[2] == "-l":
                 DataBaseActions.Gitter.alt_repo(data[3], data[4], data[5])
             elif data[2] == "-s":
-                for i in DataBaseActions.Gitter.query_repo():
-                    print(f"Git Name: {i[0]} | Host: {i[1]}")
+                rs = beauty.GitterBeauty.shows_all_data(DataBaseActions.Gitter.query_repo())
+                if len(rs) <= 0:
+                    print("There's no repositories here!")
+                else:
+                    print(rs)
             elif data[2] == "-o":
                 # gitter screen options
                 Gitter.MainScreen()
@@ -60,8 +66,6 @@ class ArgvData(object):
                 raise cls.InvalidArgv()
         elif data[1] == "-v":
             print(DataBaseActions.__version__)
-        elif data[1] == "-E":
-            pass # exportation options
         else:
             raise cls.InvalidArgv()
 

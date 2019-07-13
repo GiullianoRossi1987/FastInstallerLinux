@@ -7,6 +7,8 @@ from datacore import argv_system
 from sys import argv
 from datacore import annimations_cgi
 from datacore.backup_maker import DatabaseToBackup
+from datacore.beauty import PackagesBeauty
+from datacore.beauty import GitterBeauty
 
 
 if len(argv) > 1:
@@ -48,6 +50,7 @@ back = DatabaseToBackup()
 
 while True:
     while True:  # main menu
+        system("clear")
         system("figlet Installer")
         print("""
 [1]Installer
@@ -145,8 +148,11 @@ while True:
                 continue
             elif op2 == 6:
                 data = Installer.query_package()
-                for i in data:
-                    print("Package Name: "+str(i[0])+" | Command: "+str(i[1])+"\n")
+                rs = PackagesBeauty.shows_all_data(data)
+                if len(rs) <= 0:
+                    print("There's no packages in the database!")
+                else:
+                    print(rs)
                 input("<<press any button to return to menu>>")
                 continue
             elif op2 == 7: break
@@ -248,8 +254,11 @@ while True:
                 continue
             elif op3 == 6:
                 s = Gitter.query_repo()
-                for i in s:
-                    print("Name Git: "+i[0]+" | Link: "+i[1]+" | Remote Name: "+i[2]+"| Email used: "+i[3]+" | NameUser: "+i[4]+"\n")
+                dt = GitterBeauty.shows_all_data(s)
+                if len(dt) <= 0:
+                    print("There's no repositories in the database!")
+                else:
+                    print(dt)
                 input("<<press any button to go back to menu>>")
                 continue
             elif op3 == 7: break
