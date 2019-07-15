@@ -61,11 +61,11 @@ in the python file core.py
     If you are in python version 2, just type ``python2 installer.py``, and that will start.
 
 # News
-# V 1.0 released!
+# V 2.0 released!
 A new version came to the GitHub!  
 ## Features:
-1. Beauty appears!  
-    This new feature makes the interface a bit better! Showing the packages data like a directory tree.
+1. Repository System.  
+    Now all the repositories from packages will be configured and normalized. Even the PPAs!
    
 2. Removed database bug:
     The database connection was being always interrupted by the system, because the system can't find
@@ -77,8 +77,10 @@ A new version came to the GitHub!
 ## What'll come now?
 1. A easier exportation method to the datase
 
-## Windows Version!  
-   Will be a windows version, that will downloads, at the end of the project I'll send the link to the repository.
+## Windows No More!
+After some searches about the windows system, I decided to don't make this Windows Support, because the commands 
+will be not executed, I mean the CMD commands, just the python commands. And that makes the system don't work.   
+      
     
     
    

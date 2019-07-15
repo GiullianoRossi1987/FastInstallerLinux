@@ -15,6 +15,7 @@ mv Installer.py datacore
 mv annimations_cgi.py datacore
 
 
+
 cp ./datacore/database.db ./public_backup/  # for backup
 ./datacore/configure_requirements.sh  # execute requirements
 rm -f ./installer.sh

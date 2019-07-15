@@ -192,6 +192,62 @@ class BackupAnime(object):
         bar.finish()
 
 
+class RepositoryAnime(object):
+
+    def adding_to_db(self, repo: str):
+        bar = ProgressBar(widgets=[
+            "[Adding "+repo+"To the database ", Percentage(), "]", Bar(marker="/")
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+
+    def removing_from_db(self, repo: str):
+        bar = ProgressBar(widgets=[
+            "[Removing" + repo + "from the database ", Percentage(), "]", Bar(marker="/")
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+
+    def altering_db(self, repo: str):
+        bar = ProgressBar(widgets=[
+            "[Updating Data From  " + repo, Percentage(), "]", Bar(marker="/")
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+
+    def reading_db(self):
+        bar = ProgressBar(widgets=[
+            "[Reading the database", Percentage(), "]", Bar(marker="/")
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+
+    def config_repo(self, repo: str):
+        bar = ProgressBar(widgets=[
+            "[Configuring "+repo, Percentage(), "]", Bar(marker="/")
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+
+
+
+
+
 
 
 

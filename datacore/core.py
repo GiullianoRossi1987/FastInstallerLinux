@@ -11,6 +11,7 @@ The database use only two tables on the database: database.db
 And it have all the important and used data for configure repositories and download packages.
 """
 
+
 __version__  = 0.4
 
 
@@ -221,6 +222,220 @@ class Gitter(Database):
             chdir("..")
             del a
         annimations_cgi.GitterAnimations.clone_repo(repo)
+
+
+class RepositorySystem(Database):
+    """
+
+    """
+    local_camps = ("nm_repo", "host_vl", "is_ppa")
+
+    class RepositoryExistsError(BaseException):
+        """
+
+        """
+        args: object = "That repository already exists in the database!"
+
+    class RepositoryNotFoundError(BaseException):
+        args: object = "That repository can't be found!"
+
+    class OutOfIndexBool(BaseException):
+        args: object = "That number's out of the bool range!"
+
+    class InvalidCamp(IndexError):
+        args: object = "That camp's not valid!"
+
+    class InvalidValue(ValueError):
+        args: object = "That value's not valid for this camp!"
+
+    class RepositoryAlreadyInstalled(BaseException):
+        args: object = "That repository's already in the sources.list!"
+
+    class InvalidHostValue(BaseException):
+        args: object = "That host's not valid!"
+
+    class InvalidListStructure(BaseException):
+        args: object = "That data list it's out of range"
+
+    @classmethod
+    def check_repo_exists(cls, repo: str) -> bool:
+        """
+        Query for a repository, and checks if that repository exists in the database
+        :param repo: The repository to query.
+        :type repo : str
+        :return: if the repository exists.
+        :rtype: bool
+        """
+        query_find = cls.cursor.execute("select nm_repo from Repositories;")
+        for item in query_find.fetchall():
+            if item[0] == repo: return True
+        return False
+
+    @classmethod
+    def get_bool_index(cls, index: int) -> bool:
+        """
+        Transfer the value of the camp 'is_ppa', from int [0, 1] to bool [True, False]
+        :param index: The is_ppa value
+        :type index: int
+        :return: The bool value of the index. If index = 0 then is False, if index = 1 then is True
+        :raise cls.OutOfIndexBool: if the index is not 0 or 1.
+        """
+        if index == 1: return True
+        elif index == 0: return False
+        else: raise cls.OutOfIndexBool()
+
+    @staticmethod
+    def check_host_vl(host: str) -> bool:
+        """
+        Checks if that host's valid, it check if the host uses port 80 or port 443, another port's not valid!
+        :param host: The host to analize.
+        :type host: str
+        :return: If the host's valid.
+        :rtype: bool
+        """
+        if "https://" or "http://" in host: return True
+        else: return False
+
+    @staticmethod
+    def add_repo_ppa(repo: str):
+        """
+        Configure a ppa repository, using command 'sudo add-apt-repository ppa: %repository$/ppa'
+        :param repo: The repository to add, it's need to have '/ppa', else it'll raise a error, of course by the
+                    shell.
+        :type repo: str
+        """
+        if "/ppa" not in repo:
+            repo += "/ppa"
+        command = check_output("sudo add-apt-repository ppa:"+repo)
+        del command
+
+    @staticmethod
+    def add_repo_regular(repo: str):
+        """
+        Configures a non-ppa repository, writing it on /etc/apt/sources.list.
+        The system'll comment 'Added By FIL' in the repository line, after the repository, of course.
+        :param repo: The repository host to add in /etc/apt/sources.list
+        """
+        command = check_output(f"sudo -sh -c \"{repo} # Added By The FIL\" >> /etc/apt/sources.list")
+        del command
+
+    def add_to_db(self, repo_data: list):
+        """
+        Add a repository to the database.
+        :param repo_data: The repository data beeing:
+                            index[0] => The repository name [str].
+                            index[1] => The repository host [str].
+                            index[2] => If is a PPA repository [int]
+        :raise self.InvalidListStructure: If the data list is not valid!
+        :raise self.RepositoryExistsError: If the repository already exists in the database.
+        :raise self.InvalidHostValue: If the host value (index[1]) is not valid!
+        """
+        if len(repo_data) != 3: raise self.InvalidListStructure()
+        if self.check_repo_exists(repo_data[0]): raise self.RepositoryExistsError()
+        if not self.check_host_vl(repo_data[1]): raise self.InvalidHostValue()
+        annimations_cgi.RepositoryAnime().adding_to_db(repo_data[0])
+        add_q = self.cursor.execute("insert into Repositories (nm_repo, host_vl, is_ppa) values (?,?,?)", repo_data)
+        self.connection.commit()
+        del add_q
+
+    def del_repo_db(self, repo: str):
+        """
+        Remove a repository from the database
+        :param repo: The repository to remove
+        :type repo: str
+        :raise self.RepositoryNotFoundError: If the repository don't exists in the database.
+        """
+        if not self.check_repo_exists(repo): raise self.RepositoryNotFoundError()
+        annimations_cgi.RepositoryAnime().removing_from_db(repo)
+        del_q = self.cursor.execute(f"delete from Repositories where nm_repo='{repo}';")
+        self.connection.commit()
+        del del_q
+
+    def alt_repo_data(self, repo_to: str, camp: str, new_vl):
+        """
+        Alter some repository data on the database.
+        :param repo_to: The repository to alter.
+        :param camp: The camp, or data value type to alter on the database.
+                     It can be only:
+                        nm_repo = The repository name, [str]
+                        host_vl = The host to the repository, [str]
+                        is_ppa = If it's a PPA repository. [int]
+        :param new_vl: The new value to the data value type (camp). [str|int]
+        """
+        if not self.check_repo_exists(repo_to): raise self.RepositoryNotFoundError()
+        if not camp in self.local_camps: raise self.InvalidCamp()
+        if new_vl is not str or int: raise TypeError()
+        if camp == "is_ppa":
+            query_alt = self.cursor.execute(f"update Repositories set {camp}={new_vl} where nm_repo='{repo_to}';")
+        else:
+            query_alt = self.cursor.execute(f"update Repositories set {camp}='{new_vl}' where nm_repo='{repo_to};'")
+        annimations_cgi.RepositoryAnime().altering_db(repo_to)
+        self.connection.commit()
+        del query_alt
+
+    def get_ppa_repos(self) -> list:
+        """
+        Get all the PPA repositories in the database
+        :return: a list with all the PPA repositories in the database, all their data on tuples.
+        """
+        query_ppa = self.cursor.execute("select * from Repositories where is_ppa=1;")
+        return query_ppa.fetchall()
+
+    def get_regular_repos(self) -> list:
+        """
+        Get all the Non-PPA repositories in the database.
+        :return: a list with their data, on tuples. Ex: [(data)]
+        """
+        query_ppa = self.cursor.execute("select * from Repositories where is_ppa=0;")
+        return query_ppa.fetchall()
+
+    def get_all_repos(self) -> list:
+        """
+        Get all the repositories, without separation.
+        :return: A list with the repositories data
+                data = (id: PK (int), nm_repo (str), host_vl (str), is_ppa (int => bool)
+        """
+        query = self.cursor.execute("select * from Repositories;")
+        annimations_cgi.RepositoryAnime().reading_db()
+        return query.fetchall()
+
+    def config_repo(self, repo_nm: str = "*"):
+        """
+        Configure a repository, setting if it's a ppa or not
+        :param repo_nm: The repository to configure. default = '*'
+                        if '*', then configure all repositories, ppa or not ppa
+        """
+        if repo_nm == "*":
+            all_ppa_repos = self.get_ppa_repos()
+            all_reg_repos = self.get_regular_repos()
+            for ppa_repo in all_ppa_repos:
+                self.add_repo_ppa(ppa_repo[2])
+            for reg_repo in all_reg_repos:
+                self.add_repo_regular(reg_repo[2])
+            del all_reg_repos, all_ppa_repos
+        else:
+            if not self.check_repo_exists(repo_nm): raise self.RepositoryNotFoundError()
+            query_repo_data = self.cursor.execute(f"select * from Repositories where nm_repo='{repo_nm}';").fetchone()
+            if self.get_bool_index(query_repo_data[3]):
+                self.add_repo_ppa(query_repo_data[2])
+            else:
+                self.add_repo_regular(query_repo_data[2])
+            del query_repo_data
+        command_update = check_output("sudo apt-get update")  # update the list of the linux.
+        del command_update
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
