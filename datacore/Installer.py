@@ -6,18 +6,33 @@ from typing import Type
 from time import sleep
 from datacore.annimations_cgi import GenericSystem
 from datacore.beauty import PackagesBeauty
+from datacore.backup_maker import DatabaseToBackup
+from datacore.color_sys import LoadInColor
 
 
 class MainScreen(object):
 
     installer_obj = Installer
+    logo = """
+ ___           _        _ _           
+|_ _|_ __  ___| |_ __ _| | | ___ _ __ 
+ | || '_ \/ __| __/ _` | | |/ _ \ '__|
+ | || | | \__ \ || (_| | | |  __/ |   
+|___|_| |_|___/\__\__,_|_|_|\___|_|   
+
+    """
+
+    class EndUsage(BaseException):
+        args: object = "Ended Use!"
 
     def __init__(self):
         self.installer_obj.__init__(Type[Installer])
         GenericSystem.start_installer_system()
+        color_obj = LoadInColor()
         while True:
+            system("clear")
             while True:
-                system("figlet Installer")
+                print(color_obj.set_with_color(self.logo, "red", True))
                 print("""
 [1] Install Package
 [2] Install All Packages
@@ -103,7 +118,13 @@ class MainScreen(object):
                 print(self.installer_obj.__doc__)
                 input("<<press any button to return>>")
                 continue
-            elif opc == 8: exit(0)
+            elif opc == 8:
+                backuper = DatabaseToBackup()
+                backuper.update_backup()
+                raise self.EndUsage()
+            else:
+                input("That's not a valid option!\nTry Again!\n<<press any button to try again>>")
+                continue
 
 
 

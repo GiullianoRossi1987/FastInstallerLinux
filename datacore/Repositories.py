@@ -4,7 +4,7 @@ from datacore.core import RepositorySystem
 from datacore.beauty import RepoBeuaty
 from os import system
 from datacore.backup_maker import DatabaseToBackup
-
+from datacore.color_sys import LoadInColor
 
 
 __help__ = """"""
@@ -12,13 +12,28 @@ __help__ = """"""
 
 class MainScreen(object):
 
+    class EndUsage(BaseException):
+        args: object = "End of use!"
+
+
+    logo = """
+ ____                      _ _             _           
+|  _ \ ___ _ __   ___  ___(_) |_ ___  _ __(_) ___ _ __ 
+| |_) / _ \ '_ \ / _ \/ __| | __/ _ \| '__| |/ _ \ '__|
+|  _ <  __/ |_) | (_) \__ \ | || (_) | |  | |  __/ |   
+|_| \_\___| .__/ \___/|___/_|\__\___/|_|  |_|\___|_|   
+          |_|               
+    """
+
     def __init__(self):
         db_con = RepositorySystem()
+        color_loader = LoadInColor()
         while True:
             system("clear")
             while True:
-                system("figlet Repositorier")
+                print(color_loader.set_with_color(self.logo, "blue", True))
                 print("""
+
 Welcome!
 Would you like:
 [1] Add a Repository
@@ -117,7 +132,7 @@ Would you like:
                 continue
             elif opc1 == 8:
                 DatabaseToBackup().update_backup()
-                exit(0)
+                raise self.EndUsage()
             else:
                 print("Invalid Option!\nTry again!")
                 continue

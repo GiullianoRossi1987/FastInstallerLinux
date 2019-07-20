@@ -6,19 +6,33 @@ from typing import Type
 from os import system
 from datacore.annimations_cgi import GenericSystem
 from datacore.beauty import GitterBeauty
+from datacore.backup_maker import DatabaseToBackup
+from datacore.color_sys import LoadInColor
 
 
 class MainScreen(object):
 
     gitter_obj = Gitter
+    logo = """
+  ____ _ _   _            
+ / ___(_) |_| |_ ___ _ __ 
+| |  _| | __| __/ _ \ '__|
+| |_| | | |_| ||  __/ |   
+ \____|_|\__|\__\___|_|   
+
+    """
+
+    class EndUsage(BaseException):
+        args: object = "End of use!"
 
     def __init__(self):
         self.gitter_obj.__init__(Type[Gitter])
         GenericSystem.start_gitter_system()
+        color_loader = LoadInColor()
         while True:
+            system("clear")
             while True:
-                system("clear")
-                system("figlet Gitter")
+                print(color_loader.set_with_color(self.logo, "green", True))
                 print("""
 [1] Configure Repository
 [2] Configure All Repositories
@@ -129,8 +143,16 @@ class MainScreen(object):
                 print(self.gitter_obj.__doc__)
                 input("<<press any button to return>>")
                 continue
+            elif op1 == 8:
+                backuper = DatabaseToBackup()
+                backuper.update_backup()
+                raise self.EndUsage()
             else:
-                exit(0)
+                print("Invalid Option!")
+                input("Try Again!\n<<press any button to try again>>")
+                continue
+
+
 
 
 

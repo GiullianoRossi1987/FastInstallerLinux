@@ -229,6 +229,7 @@ class RepositorySystem(Database):
 
     """
     local_camps = ("nm_repo", "host_vl", "is_ppa")
+    help_sys = """"""
 
     class RepositoryExistsError(BaseException):
         """

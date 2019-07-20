@@ -3,8 +3,6 @@
 import os
 from typing import AnyStr
 from datacore.annimations_cgi import BackupAnime
-from sys import argv
-
 
 
 class DatabaseToBackup(object):

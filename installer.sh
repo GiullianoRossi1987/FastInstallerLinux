@@ -17,6 +17,13 @@ mv annimations_cgi.py datacore
 
 
 cp ./datacore/database.db ./public_backup/  # for backup
-./datacore/configure_requirements.sh  # execute requirements
+# configure requirements
+sudo apt-get install snapd
+sudo apt-get install git
+sudo apt-get install python-sqlite3
+sudo apt-get install python3-sqlite3
+sudo apt-get install python3-pip
+sudo apt-get install figlet
+sudo pip3 install processbar
 rm -f ./installer.sh
 

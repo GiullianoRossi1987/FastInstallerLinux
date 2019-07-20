@@ -1,6 +1,5 @@
 .idea
 .vscode
-tester.py
 
 datacore/__pycache__
 ./datacore/logger.py
