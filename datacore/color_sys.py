@@ -18,6 +18,16 @@ class LoadInColor(object):
         "purple": "\033[1;35m"
     }
 
+    _back_colors = {
+        "red": "\033[1;41m",
+        "black": "\033[1;40m",
+        "yellow": "\033[1;43m",
+        "green": "\033[1;42m",
+        "purple": "\033[1;45m",
+        "blue": "\033[1;44m",
+        "reset": "\033[0;0m"
+    }
+
     def set_with_color(self, msg: str, color: str, new_line=False) -> str:
         """
         Return a string with the choose color
@@ -33,4 +43,29 @@ class LoadInColor(object):
         if new_line:
             result += "\n"
         return result
+
+    def set_background_color(self, msg: str, color: str) -> str:
+        """
+
+        :param msg:
+        :param color:
+        :return:
+        """
+        return self._back_colors[color] + msg + self._back_colors["reset"]
+
+    def load(self, msg: str, color: str, background: str = "reset", new_line=False) -> str:
+        """
+
+        :param msg:
+        :param color:
+        :param background:
+        :param new_line:
+        :return:
+        """
+        rs = self._back_colors[background] + self._colors[color] + msg + self._colors["reset"]
+        if new_line:
+            rs += "\n"
+        rs += self._back_colors["reset"]
+        return rs
+
 

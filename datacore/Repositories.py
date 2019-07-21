@@ -5,6 +5,7 @@ from datacore.beauty import RepoBeuaty
 from os import system
 from datacore.backup_maker import DatabaseToBackup
 from datacore.color_sys import LoadInColor
+from datacore.annimations_cgi import GenericSystem
 
 
 __help__ = """"""
@@ -29,6 +30,7 @@ class MainScreen(object):
         db_con = RepositorySystem()
         color_loader = LoadInColor()
         while True:
+            GenericSystem.start_repositorier_system()
             system("clear")
             while True:
                 print(color_loader.set_with_color(self.logo, "blue", True))

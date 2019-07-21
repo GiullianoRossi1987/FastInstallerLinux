@@ -13,6 +13,9 @@ mv database.db datacore
 mv Gitter.py datacore
 mv Installer.py datacore
 mv annimations_cgi.py datacore
+mv Repositories.py datacore
+mv backup_config.dat datacore
+
 
 
 

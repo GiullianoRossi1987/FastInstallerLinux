@@ -61,25 +61,18 @@ in the python file core.py
     If you are in python version 2, just type ``python2 installer.py``, and that will start.
 
 # News
-# V 2.0 released!
+# V 2.1 released!
 A new version came to the GitHub!  
 ## Features:
-1. Repository System.  
-    Now all the repositories from packages will be configured and normalized. Even the PPAs!
-   
-2. Removed database bug:
+1. Removed database bug:
     The database connection was being always interrupted by the system, because the system can't find
     the .db file, but't was successfully suppressed. Now it works nicely.
    
-3. Backup Maker.  
-    Always after a execution a backup from the database'll appears in ./public_backup, as a .db file.
+2.Colors!
+    A color schema have been added on the system.
 
 ## What'll come now?
-1. A easier exportation method to the datase
-
-## Windows No More!
-After some searches about the windows system, I decided to don't make this Windows Support, because the commands 
-will be not executed, I mean the CMD commands, just the python commands. And that makes the system don't work.   
+1. A way to disable the colors and more customization options 
       
     
     
