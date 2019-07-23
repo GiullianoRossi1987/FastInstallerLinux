@@ -101,7 +101,7 @@ class Installer(Database):
     def query_package(cls) -> list:
         """"""
         annimations_cgi.InstallerAnimation.show()
-        return cls.cursor.execute("select Nm_Pack, Command from Packages;").fetchall()
+        return cls.cursor.execute("select * from Packages;").fetchall()
 
     @classmethod
     def install_package(cls, package="--all"):
@@ -187,7 +187,7 @@ class Gitter(Database):
         It takes all the data in the database, raising only the repository name, the host, the remote name
         """
         annimations_cgi.GitterAnimations.show()
-        return cls.cursor.execute("select Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser from Gits;").fetchall()
+        return cls.cursor.execute("select * from Gits;").fetchall()
 
     @classmethod
     def config_repo(cls, repo="--all", dir_to_clone="--pwd"):

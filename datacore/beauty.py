@@ -16,8 +16,6 @@ class PackagesBeauty(object):
     Contains all the Beauty Graphics from the packages system
     """
 
-    camps_to = ("ID", "Name", "Command Unix")
-
 
     @classmethod
     def shows_one_data(cls, data: tuple) -> str:
@@ -64,7 +62,7 @@ class GitterBeauty(object):
         results +=  vl_ident_bar_r + color_loader.load("ID", "blue")+" -> "+str(data[0]) + "\n"
         results += vl_ident_bar_r + color_loader.load("Git Name", "yellow")+" -> "+data[1] + "\n"
         results += vl_ident_bar_r + color_loader.load("Link repository", "red")+" -> "+data[2] + "\n"
-        results += vl_ident_bar_r +  color_loader.load("Remote Name", "")+" -> "+data[3]+"\n"
+        results += vl_ident_bar_r +  color_loader.load("Remote Name", "green")+" -> "+data[3]+"\n"
         results += vl_ident_bar_r + "Email User -> "+data[4]+"\n"
         results += vl_ident_bar_r + "User Name -> " + data[5] + "\n"
         results += "}\n"
