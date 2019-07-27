@@ -259,6 +259,35 @@ class RepositoryAnime(object):
         bar.finish()
 
 
+class ExporterAnimations(object):
+    """
+
+    """
+
+    @staticmethod
+    def import_data_from(db_from: str):
+        bar = ProgressBar(widgets=[
+            "[Importing Data From "+db_from, Percentage(), "]", str_bar
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.2)
+            bar.update(i)
+        bar.finish()
+
+    @staticmethod
+    def export_data_to(db_to: str):
+        bar = ProgressBar(
+            widgets=[
+                "[Exporting Data To "+db_to, Percentage(), "]", str_bar
+            ],
+            maxval=100
+        )
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.2)
+            bar.update(i)
+        bar.finish()
 
 
 

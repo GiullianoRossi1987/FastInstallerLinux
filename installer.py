@@ -9,6 +9,7 @@ from datacore.backup_maker import DatabaseToBackup
 from datacore.Repositories import MainScreen as repositories_screen
 from datacore.Installer import MainScreen as installer_screen
 from datacore.Gitter import MainScreen as gitter_screen
+from datacore.Exporter import MainExporterScreen
 
 
 if len(argv) > 1:
@@ -65,8 +66,9 @@ while True:
 [1]Installer
 [2] Gitter
 [3] Help
-[4] Exit
-[5] Repositer                             
+[4] Repositer
+[5] Exporter
+[6]                             
         """)
         op1 = int(input(">>> "))
         r = int(input("Confirm? [1]y/[2]n \n>>> "))
@@ -83,14 +85,23 @@ while True:
         print(__doc__)
         input("<<press any button to return to menu>>")
         continue
-    elif op1 == 4:
+    elif op1 == 6:
         back.update_backup()
         exit(0)
-    elif op1 == 5:
+    elif op1 == 4:
         try:
             respositories = repositories_screen()
         except repositories_screen.EndUsage:
             continue
+    elif op1 == 5:
+        try: MainExporterScreen().main_screen_exporter()
+        except MainExporterScreen.EndOfUsage: continue
+    else:
+        print("That's not a valid option!\nTry again")
+        input("<<press any button to return>>")
+        continue
+
+
 
 
 

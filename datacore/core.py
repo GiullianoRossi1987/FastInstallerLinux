@@ -426,6 +426,90 @@ class RepositorySystem(Database):
         del command_update
 
 
+class DatabaseExporter(Database):
+    """
+That class have a important new feature to the system, that's will export local data to other database.
+It works hearing the Database class, and the main features are export_data_to() and the main_screen_exporter().
+
+:exception EndOfUsage: The system need't to alert the file installer.py on .. to return the loop in the screens!
+    """
+    exporter_logo = """
+ _____                       _            
+| ____|_  ___ __   ___  _ __| |_ ___ _ __ 
+|  _| \ \/ / '_ \ / _ \| '__| __/ _ \ '__|
+| |___ >  <| |_) | (_) | |  | ||  __/ |   
+|_____/_/\_\ .__/ \___/|_|   \__\___|_|   
+           |_| 
+    """
+
+    help_str = """
+    """
+    animation = annimations_cgi.ExporterAnimations()
+
+    class EndOfUsage(Exception):
+        args = "Final Use"
+
+    def export_data_to(self, to_db: str):
+        """
+        It inserts the local data from the Packages system, Gitter System and Repositorier System.
+        In another words, it forks the database to insert the local data to the database to export.
+        :param to_db: The database to send the information. It'll be open by the connection_to_db.
+        """
+        connection_to_db = sqlite3.connect(to_db)
+        cursor_to = connection_to_db.cursor()
+        self.animation.export_data_to(to_db)
+        # sends to the Packages system
+        for dt in self.cursor.execute("select * from Packages;").fetchall():
+            try:
+                cursor_to.execute("insert in Packages (Nm_Pack, Command) values (?,?);", dt)
+            except sqlite3.DatabaseError or sqlite3.ProgrammingError:  # if the data already exists in the database to
+                pass
+        # sends to the Gitter System
+        for git_data in self.cursor.execute("select * from Gits;").fetchall():
+            try:
+                cursor_to.execute("insert into Gits (Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser) values (?,?,?,?,?);", git_data)
+            except sqlite3.DatabaseError or sqlite3.ProgrammingError:
+                pass
+        # sends to the Repositorier System
+        for repo_data in self.cursor.execute("select * from Repositories;").fetchall():
+            try:
+                cursor_to.execute("insert into Repositories (nm_repo, host_vl, is_ppa) values (?,?,?)", repo_data)
+            except sqlite3.DatabaseError or sqlite3.ProgrammingError: pass
+        connection_to_db.commit()
+        cursor_to.close()
+        connection_to_db.close()
+
+    def import_from(self, db_from: str):
+        """
+        Imports the main data from other database, like the export_data_to, but it gets the data from.
+        :param db_from: The database to get the data
+        """
+        connection_from = sqlite3.connect(db_from)
+        cursor_from = connection_from.cursor()
+        self.animation.import_data_from(db_from)
+        # gets Packages data
+        for dt in cursor_from.execute("select * from Packages;").fetchall():
+            try:
+                self.cursor.execute("insert into Packages (Nm_Pack, Command) values (?,?);", dt)
+            except sqlite3.ProgrammingError or sqlite3.DatabaseError: pass
+        # gets Gitter data
+        for gitter in cursor_from.execute("select * from Gits;").fetchall():
+            try:
+                self.cursor.execute("insert into Gits (Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser) values (?,?,?,?,?);", gitter)
+            except sqlite3.DatabaseError or sqlite3.ProgrammingError: pass
+        # gets Repositorier data
+        for repo_data in cursor_from.execute("select * from Repositories;").fetchall():
+            try:
+                self.cursor.execute("insert into Repositories (nm_repo, host_vl, is_ppa) values (?,?,?);", repo_data)
+            except sqlite3.ProgrammingError or sqlite3.DatabaseError: pass
+
+
+
+
+
+
+
+
 
 
 
