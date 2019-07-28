@@ -459,22 +459,25 @@ It works hearing the Database class, and the main features are export_data_to() 
         cursor_to = connection_to_db.cursor()
         self.animation.export_data_to(to_db)
         # sends to the Packages system
-        for dt in self.cursor.execute("select * from Packages;").fetchall():
+        for dt in self.cursor.execute("select Nm_Pack, Command from Packages;").fetchall():
             try:
-                cursor_to.execute("insert in Packages (Nm_Pack, Command) values (?,?);", dt)
+                cursor_to.execute("insert into Packages (Nm_Pack, Command) values (?,?);", dt)
             except sqlite3.DatabaseError or sqlite3.ProgrammingError:  # if the data already exists in the database to
                 pass
+            connection_to_db.commit()
         # sends to the Gitter System
-        for git_data in self.cursor.execute("select * from Gits;").fetchall():
+        for git_data in self.cursor.execute("select Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser from Gits;").fetchall():
             try:
                 cursor_to.execute("insert into Gits (Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser) values (?,?,?,?,?);", git_data)
             except sqlite3.DatabaseError or sqlite3.ProgrammingError:
                 pass
+            connection_to_db.commit()
         # sends to the Repositorier System
-        for repo_data in self.cursor.execute("select * from Repositories;").fetchall():
+        for repo_data in self.cursor.execute("select nm_repo, host_vl, is_ppa from Repositories;").fetchall():
             try:
-                cursor_to.execute("insert into Repositories (nm_repo, host_vl, is_ppa) values (?,?,?)", repo_data)
+                cursor_to.execute("insert into Repositories (nm_repo, host_vl, is_ppa) values (?,?,?);", repo_data)
             except sqlite3.DatabaseError or sqlite3.ProgrammingError: pass
+            connection_to_db.commit()
         connection_to_db.commit()
         cursor_to.close()
         connection_to_db.close()
@@ -488,20 +491,21 @@ It works hearing the Database class, and the main features are export_data_to() 
         cursor_from = connection_from.cursor()
         self.animation.import_data_from(db_from)
         # gets Packages data
-        for dt in cursor_from.execute("select * from Packages;").fetchall():
+        for dt in cursor_from.execute("select Nm_Pack, Command from Packages;").fetchall():
             try:
                 self.cursor.execute("insert into Packages (Nm_Pack, Command) values (?,?);", dt)
             except sqlite3.ProgrammingError or sqlite3.DatabaseError: pass
         # gets Gitter data
-        for gitter in cursor_from.execute("select * from Gits;").fetchall():
+        for gitter in cursor_from.execute("select Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser from Gits;").fetchall():
             try:
                 self.cursor.execute("insert into Gits (Nm_Git, Host_Git, Remote_Nm, EmailUser, NameUser) values (?,?,?,?,?);", gitter)
             except sqlite3.DatabaseError or sqlite3.ProgrammingError: pass
         # gets Repositorier data
-        for repo_data in cursor_from.execute("select * from Repositories;").fetchall():
+        for repo_data in cursor_from.execute("select nm_repo, host_vl, is_ppa from Repositories;").fetchall():
             try:
                 self.cursor.execute("insert into Repositories (nm_repo, host_vl, is_ppa) values (?,?,?);", repo_data)
             except sqlite3.ProgrammingError or sqlite3.DatabaseError: pass
+        self.connection.commit()
 
 
 
