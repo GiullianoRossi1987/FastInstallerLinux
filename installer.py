@@ -6,10 +6,10 @@ from datacore import argv_system
 from sys import argv
 from datacore import annimations_cgi
 from datacore.backup_maker import DatabaseToBackup
-from datacore.Repositories import MainScreen as repositories_screen
-from datacore.Installer import MainScreen as installer_screen
-from datacore.Gitter import MainScreen as gitter_screen
-from datacore.Exporter import MainExporterScreen
+from sys_screens.Repositories import MainScreen as repositories_screen
+from sys_screens.Installer import MainScreen as installer_screen
+from sys_screens.Gitter import MainScreen as gitter_screen
+from sys_screens.Exporter import MainExporterScreen
 
 
 if len(argv) > 1:

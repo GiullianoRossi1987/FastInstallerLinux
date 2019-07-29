@@ -5,14 +5,15 @@ from os import chdir
 from os import system as check_output
 from datacore import annimations_cgi
 
-__doc__ = """
+
+"""
 This is the main database system. You can import this file, or easily start the main file (installer.py)
 The database use only two tables on the database: database.db
 And it have all the important and used data for configure repositories and download packages.
 """
 
 
-__version__  = 0.4
+__version__  = 1.5
 
 
 class Database(object):
@@ -30,12 +31,46 @@ class Database(object):
         """Start the connection and declare the cursor.Maybe not useful. But there is it."""
         self.closed = False
         self.started = True
+        if self.check_data_values != 0:
+            raise self.ErrorSystem()
 
     def close(self):
         """Closes the connection and the cursor, also it alerts the system there was a closed connection"""
         self.cursor.close()
         self.connection.close()
         self.closed = True
+
+    def format_database(self):
+        """
+        Excludes all the data on the database, and return a list with the numbers of the
+        lines excluded.
+        """
+        qr = self.cursor.executescript("""
+delete from Packages;
+delete from Gits;
+delete from Repositories;
+
+update sqlite_sequence set seq=0 where name="Packages";
+update sqlite_sequence set seq=0 where name="Gits";
+update sqlite_sequence set seq=0 where name="Repositories";
+        """)
+        del qr
+
+    class ErrorSystem(Warning):
+        args = "There's errors on the database!"
+    
+    @classmethod
+    def check_data_values(cls) -> int:
+        """
+        Verifie some data from the database.
+        :return: the tot of the values that contains errors
+        """
+        qr_packs = cls.cursor.execute("select Nm_Pack from Packages where \"sudo\" not in Command;").fetchall()
+        qr_gits = cls.cursor.execute("select Nm_Git from Gits where \"https://github.com/\" not in Host_Git;").fetchall()
+        qr_repositories = cls.cursor.execute("select nm_repo from Repositories where \"http\" in host_vl;").fetchall()
+        return len(qr_packs) + len(qr_gits) + len(qr_repositories)
+
+
 
 
 class Installer(Database):
@@ -75,9 +110,6 @@ class Installer(Database):
         cls.connection.commit()
         del a # to not use many memory part
         annimations_cgi.InstallerAnimation.add_pack(data[0])
-
-
-
 
     @classmethod
     def del_package(cls, package: str):
@@ -121,7 +153,6 @@ class Installer(Database):
             b = check_output(a.fetchall()[0][0])
             print(b)
             del a,b
-
 
 class Gitter(Database):
 
