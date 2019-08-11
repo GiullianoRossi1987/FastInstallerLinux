@@ -160,8 +160,8 @@ class GenericSystem(object):
             bar.update(i)
         bar.finish()
 
-    @classmethod
-    def start_gitter_system(cls):
+    @staticmethod
+    def start_gitter_system():
         bar = ProgressBar(widgets=[
             "[Initializing Gitter With Interface ", Percentage(), "]", str_bar
         ], maxval=10)
@@ -185,7 +185,8 @@ class GenericSystem(object):
 
 class BackupAnime(object):
 
-    def sending_to_backup(self):
+    @staticmethod
+    def sending_to_backup():
         bar = ProgressBar(widgets=[
             "[Setting Database Backup as Default", Percentage(), "]", str_bar
         ], maxval=100)
@@ -195,7 +196,8 @@ class BackupAnime(object):
             bar.update(i)
         bar.finish()
 
-    def creating_database(self):
+    @staticmethod
+    def creating_database():
         bar = ProgressBar(widgets=[
             "[Setting Database Backup as Default", Percentage(), "]", str_bar
         ], maxval=100)
@@ -289,6 +291,112 @@ class ExporterAnimations(object):
             bar.update(i)
         bar.finish()
 
+
+class DebPacks(object):
+
+    @staticmethod
+    def installing_package(pack: str):
+        bar = ProgressBar(widgets=[
+            "[Preparing to install "+pack, Percentage(), "]", str_bar
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+
+    @staticmethod
+    def adding_pack(pack: str):
+        """
+
+        :param pack:
+        :return:
+        """
+        bar = ProgressBar(widgets=[
+            "[Adding "+pack, Percentage(), "]", str_bar
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(bar.maxval)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+
+    @staticmethod
+    def rem_pack(pack: str):
+        """
+
+        :param pack:
+        :return:
+        """
+        bar = ProgressBar(widgets=[
+            "[Removing "+pack, Percentage(), "]", str_bar
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+
+    @staticmethod
+    def alter_pack(pack: str):
+        """
+
+        :param pack:
+        :return:
+        """
+        bar = ProgressBar(widgets=[
+            "[Altering "+pack+" Data ", Percentage, "]", str_bar
+        ], maxval=100)
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.2)
+            bar.update(i)
+        bar.finish()
+
+    @staticmethod
+    def reading_database():
+        """
+
+        :return:
+        """
+        bar = ProgressBar(
+            widgets=["[Reading Database ", Percentage(), "]", str_bar],
+            maxval=100
+        )
+        bar.start()
+        for i in bar(range(0, 100)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+
+
+class AdvancedOptionsAnime(object):
+
+    @staticmethod
+    def updating_configurations():
+        """"""
+        bar = ProgressBar(
+            widgets=["[Altering Configurations ", Percentage(), "]", str_bar],
+            maxval=100
+        )
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.1)
+            bar.update(i)
+        bar.finish()
+        print("Altered Configurations!")
+
+    @staticmethod
+    def restore_default_conf():
+        bar = ProgressBar(
+            widgets=["[Restoring Configurations ", Percentage(), "]", str_bar],
+            maxval=100
+        )
+        bar.start()
+        for i in bar(range(100)):
+            time.sleep(0.2)
+            bar.update(i)
+        bar.finish()
 
 
 

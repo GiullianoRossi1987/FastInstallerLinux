@@ -4,7 +4,12 @@ import sqlite3
 from os import chdir
 from os import system as check_output
 from datacore import annimations_cgi
+from os import listdir
+from typing import AnyStr
+from datacore.color_sys import LoadInColor
 
+
+colorer = LoadInColor()
 
 """
 This is the main database system. You can import this file, or easily start the main file (installer.py)
@@ -24,21 +29,11 @@ class Database(object):
     """
     connection = sqlite3.connect("./datacore/database.db", timeout=10)
     cursor = connection.cursor()
-    closed = bool
-    started = bool
 
-    def __init__(self):
+    def __init__(self, file_db: AnyStr = "./datacore/database.db"):
         """Start the connection and declare the cursor.Maybe not useful. But there is it."""
-        self.closed = False
-        self.started = True
-        if self.check_data_values != 0:
-            raise self.ErrorSystem()
-
-    def close(self):
-        """Closes the connection and the cursor, also it alerts the system there was a closed connection"""
-        self.cursor.close()
-        self.connection.close()
-        self.closed = True
+        self.connection = sqlite3.connect(file_db)
+        self.cursor = self.connection.cursor()
 
     def format_database(self):
         """
@@ -56,22 +51,50 @@ update sqlite_sequence set seq=0 where name="Repositories";
         """)
         del qr
 
-    class ErrorSystem(Warning):
-        args = "There's errors on the database!"
-    
-    @classmethod
-    def check_data_values(cls) -> int:
-        """
-        Verifie some data from the database.
-        :return: the tot of the values that contains errors
-        """
-        qr_packs = cls.cursor.execute("select Nm_Pack from Packages where \"sudo\" not in Command;").fetchall()
-        qr_gits = cls.cursor.execute("select Nm_Git from Gits where \"https://github.com/\" not in Host_Git;").fetchall()
-        qr_repositories = cls.cursor.execute("select nm_repo from Repositories where \"http\" in host_vl;").fetchall()
-        return len(qr_packs) + len(qr_gits) + len(qr_repositories)
+    def restore_database(self):
+        """"""
+        # droping all the tables
+        query_tbs = self.cursor.execute("select name from sqlite_master where type=\"table\";")
+        for tb in query_tbs.fetchall(): dell_com = self.cursor.execute("drop table "+tb[0]+";")
+        query_recreate = self.cursor.execute(
+            """
+create table Packages(
+    Cd_Pack integer primary key autoincrement not null unique,
+    Nm_Pack text not null unique,
+    Command text not null unique
+);
 
+create table Gits(
+    Cd_Git integer primary key autoincrement not null unique,
+    Nm_Git text not null unique,
+    Host_Git text not null unique,
+    Remote_Nm text not null unique,
+    EmailUser text not null unique,
+    NameUser text not null unique
+);
 
+create table Repositories(
+    cd_repo integer primary key autoincrement not null unique,
+    nm_repo text not null unique,
+    host_vl text not null unique,
+    is_ppa integer not null check(is_ppa in (0, 1))
+);
 
+create table DebPacks(
+    cd_pack integer primary key autoincrement not null unique,
+    nm_deb text not null unique,
+    link_download text not null unique,
+    vl_installed integer not null check(vl_installed in (0, 1))
+);
+
+            """
+        )
+        del query_recreate,query_tbs
+
+    @staticmethod
+    def restore_external_database(db: AnyStr):
+        con = Database(db)
+        con.restore_database()
 
 class Installer(Database):
 
@@ -159,6 +182,7 @@ class Gitter(Database):
     __doc__ = """
     This class works with the git repositories in the database.
     """
+    # doc_data_config = git_config_data.configurations
 
     class RepositoryNotFound(Exception):
         """If the typed repository was not found"""
@@ -537,6 +561,136 @@ It works hearing the Database class, and the main features are export_data_to() 
                 self.cursor.execute("insert into Repositories (nm_repo, host_vl, is_ppa) values (?,?,?);", repo_data)
             except sqlite3.ProgrammingError or sqlite3.DatabaseError: pass
         self.connection.commit()
+
+
+class DebianPacks(Database):
+    """
+
+    """
+    
+    help_txt = """"""
+
+    class PackageExistsError(Exception):
+        args: object = "That package already exists!"
+
+    class PackageNotFound(Exception):
+        args: object = "That package can't be find in the database"
+
+    class InvalidDownloadLink(Exception):
+        args = "That's not a valid download link!"
+
+    class InvalidCamp(Exception):
+        args = "That's not a valid camp from the database!"
+
+    @staticmethod
+    def check_file_downloaded(link_file: str) -> bool:
+        """
+
+        :param link_file:
+        :return:
+        """
+        sep_link = link_file.split("/")
+        return sep_link[-1] in listdir("./deb_bins")
+
+
+    @staticmethod
+    def check_link_download(link: str) -> bool:
+        """
+
+        :param link:
+        :return:
+        """
+        return "http://" in link and ".deb" in link and "/" in link
+
+
+    @classmethod
+    def check_debpack_exists(cls, deb_pack_name: str) -> bool:
+        """
+
+        :param deb_pack_name:
+        :return:
+        """
+        query_all = cls.cursor.execute("select nm_pack from DebPacks;").fetchall()
+        for item in query_all:
+            if deb_pack_name == item[0]: return True
+        return False
+
+    def add_deb_pack(self, pack_data: list):
+        """
+
+        :param pack_data:
+        """
+        if self.check_debpack_exists(pack_data[0]): raise self.PackageExistsError()
+        if not self.check_link_download(pack_data[1]): raise self.InvalidDownloadLink()
+        command_insert = self.cursor.execute("insert into DebPacks (nm_pack, link_download, vl_installed) values (?,?,?);", pack_data)
+        self.connection.commit()
+        del command_insert
+
+    def del_deb_pack(self, deb_pack: str):
+        """
+
+        :param deb_pack:
+        """
+        if not self.check_debpack_exists(deb_pack): raise self.PackageNotFound()
+        del_com = self.cursor.execute(f"delete from DebPacks where nm_pack = \"{deb_pack}\";")
+        self.connection.commit()
+        del del_com
+
+    def alt_deb_pack(self, camp: str, new_vl, deb_pack: str):
+        """
+
+        :param camp:
+        :param new_vl:
+        :param deb_pack:
+        """
+        if not self.check_debpack_exists(deb_pack): raise self.PackageNotFound()
+        if camp not in ["nm_pack", "link_download", "vl_installed"]: raise self.InvalidCamp()
+        if camp == "vl_installed":
+            query_alt = self.cursor.execute(f"update DebPacks set vl_installed={new_vl} where nm_pack=\"{deb_pack}\";")
+        else:
+            query_alt = self.cursor.execute(f"update DebPacks set {camp}=\"{new_vl}\" where nm_pack=\"{deb_pack}\";")
+        self.connection.commit()
+        del query_alt
+
+    def get_deb_packs(self) -> list:
+        """
+
+        :return:
+        """
+        query_db = self.cursor.execute("select * from DebPacks;")
+        return query_db.fetchall()
+
+    def install_deb_pack(self, pack="*"):
+        """
+
+        :param pack:
+        :return:
+        """
+        if pack == "*":
+            data = self.get_deb_packs()
+            for deb_item in data:
+                sep = str(deb_item[2]).split("/")
+                file = sep[-1]
+                annimations_cgi.DebPacks.installing_package(deb_item[1])
+                if not self.check_file_downloaded(deb_item[2]):
+                    check_output(f"cd ./deb_bins && wget {deb_item[2]} && cd ..")
+                check_output("sudo apt install ./deb_packs/"+file)
+        else:
+            if not self.check_debpack_exists(pack): raise self.PackageNotFound()
+            data_pack = self.cursor.execute("select nm_pack, link_download, vl_installed from DebPacks;").fetchone()
+            sep = str(data_pack[1]).split('/')
+            if not self.check_file_downloaded(data_pack[1]):
+                check_output(f"cd ./deb_bins && wget {data_pack[1]}")
+                if int(data_pack[2]) != 1:
+                    self.alt_deb_pack("vl_installed", 1, data_pack[0])
+            annimations_cgi.DebPacks.installing_package(data_pack[0])
+            check_output(f"sudo apt install ./{sep[-1]} && cd ..")
+
+
+
+
+
+
 
 
 

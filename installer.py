@@ -10,6 +10,10 @@ from sys_screens.Repositories import MainScreen as repositories_screen
 from sys_screens.Installer import MainScreen as installer_screen
 from sys_screens.Gitter import MainScreen as gitter_screen
 from sys_screens.Exporter import MainExporterScreen
+from sys_screens.DebPacks import DebPacksScreen
+
+
+about = """"""
 
 
 if len(argv) > 1:
@@ -19,6 +23,7 @@ if len(argv) > 1:
 database = core.Database()
 Installer = core.Installer()
 Gitter = core.Gitter()
+DebPacks = core.DebianPacks()
 
 __doc__ = """
 FastInstallerLinux: This is a fast, easy and simple database to save your favorites tools, github repositories,
@@ -63,12 +68,15 @@ while True:
         system("clear")
         print(logo)
         print("""
-[1]Installer
+[1] Installer
 [2] Gitter
 [3] Help
 [4] Repositer
 [5] Exporter
-[6]                             
+[6] Debian Packages
+[7] About
+[8] Format Database
+[9] Exit
         """)
         op1 = int(input(">>> "))
         r = int(input("Confirm? [1]y/[2]n \n>>> "))
@@ -85,7 +93,7 @@ while True:
         print(__doc__)
         input("<<press any button to return to menu>>")
         continue
-    elif op1 == 6:
+    elif op1 == 9:
         back.update_backup()
         exit(0)
     elif op1 == 4:
@@ -96,6 +104,18 @@ while True:
     elif op1 == 5:
         try: MainExporterScreen().main_screen_exporter()
         except MainExporterScreen.EndOfUsage: continue
+    elif op1 == 6:
+        try: DebPacksScreen().main_screen()
+        except DebPacksScreen.EndUsage: continue
+    elif op1 == 7:
+        print(__doc__)
+        input("<<press any button to return ")
+        continue
+    elif op1 == 8:
+        print("""""")  # warning message
+        t = int(input(">>> "))
+        if t == 1: core.Database().format_database()
+        else: continue
     else:
         print("That's not a valid option!\nTry again")
         input("<<press any button to return>>")

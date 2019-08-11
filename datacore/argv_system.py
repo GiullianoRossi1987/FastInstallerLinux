@@ -1,6 +1,6 @@
 # coding = utf-8
 # using namespace std
-from datacore import Gitter, Installer
+from sys_screens import Gitter, Installer
 from datacore import core as DataBaseActions
 from sys import argv
 from datacore import beauty
@@ -88,6 +88,28 @@ class ArgvData(object):
                     print("There's no repositories!")
                 else:
                     print(repos)
+        elif data[1] == "-D":
+            db = DataBaseActions.DebianPacks()
+            if data[2] == "--help" or "-h": print(db.help_txt)
+            elif data[2] == "-i" or "--install":
+                db.install_deb_pack(data[3])
+            elif data[2] == "-a" or "--add":
+                db.add_deb_pack([data[3], data[4], int(data[5])])
+            elif data[2] == "-d" or "--delete":
+                db.del_deb_pack(data[3])
+            elif data[2] == "-l" or "--alter":
+                db.alt_deb_pack(data[3], data[4], data[5])
+            elif data[2] == "-s" or "--show":
+                rs = db.get_deb_packs()
+                if len(rs) <= 0: print("There's no Debian Packages !")
+                else: print(beauty.DebBeauty().show_all_data(rs))
+            else: raise cls.InvalidArgv()
+        elif data[1] == "--export":
+            exp = DataBaseActions.DatabaseExporter()
+            exp.export_data_to(data[2])
+        elif data[1] == "--import":
+            imp = DataBaseActions.DatabaseExporter()
+            imp.import_from(data[2])
         else:
             raise cls.InvalidArgv()
 

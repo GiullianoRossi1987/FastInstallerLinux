@@ -2,7 +2,6 @@
 # using namespace std
 from datacore.core import Installer
 from os import system
-from typing import Type
 from time import sleep
 from datacore.annimations_cgi import GenericSystem
 from datacore.beauty import PackagesBeauty
@@ -12,7 +11,7 @@ from datacore.color_sys import LoadInColor
 
 class MainScreen(object):
 
-    installer_obj = Installer
+    installer_obj = Installer()
     logo = """
  ___           _        _ _           
 |_ _|_ __  ___| |_ __ _| | | ___ _ __ 
@@ -26,7 +25,6 @@ class MainScreen(object):
         args: object = "Ended Use!"
 
     def __init__(self):
-        self.installer_obj.__init__(Type[Installer])
         GenericSystem.start_installer_system()
         color_obj = LoadInColor()
         while True:

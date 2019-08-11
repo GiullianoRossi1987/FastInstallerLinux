@@ -113,6 +113,38 @@ class RepoBeuaty(object):
         return rs
 
 
+class DebBeauty(object):
+
+    @classmethod
+    def shows_one_data(cls, data: tuple) -> str:
+        """
+
+        :param data:
+        :return:
+        """
+        installed_pack = "true" if data[3] else "false"
+        results = ""
+        ident = " "*4
+        results += data[1] + "{\n"
+        results += ident+ "Link Download: "+data[2]+"\n"
+        results += ident+"Downloaded .deb file: "+installed_pack+"\n"
+        results += "}"
+        return results
+
+    @classmethod
+    def show_all_data(cls, all_data: list) -> str:
+        """
+
+        :param all_data:
+        :return:
+        """
+        rs = ""
+        for data in all_data: rs += cls.shows_one_data(data)
+        return rs
+
+
+
+
 
 
 
